@@ -127,6 +127,54 @@ See `walkthrough.md` for detailed feature guide.
 - Complete audit logging
 - IP address tracking
 
-## 📝 License
+## � Troubleshooting
+
+### Port already in use
+
+```bash
+# Kill process on port 3001 (Windows)
+netstat -ano | findstr :3001
+taskkill /PID <PID> /F
+
+# Kill process on port 5173
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
+```
+
+### Database locked
+
+```bash
+# Stop the server and delete lock files
+cd server
+del bodega.sqlite-shm
+del bodega.sqlite-wal
+node seed.js  # Reinitialize
+```
+
+### Missing JWT_SECRET error
+
+```bash
+# Make sure you have a .env file
+cd server
+copy .env.example .env
+# Edit .env and set JWT_SECRET
+```
+
+### Client won't start
+
+```bash
+cd client
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+### Import Excel errors
+
+- Ensure file has columns: SKU, Name, Description, Price (USD), Stock, Active
+- SKU and Name are required
+- Active must be "Yes" or "No"
+
+## �📝 License
 
 MIT
