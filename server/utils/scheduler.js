@@ -10,25 +10,25 @@ function startBackupScheduler() {
   const enabled = process.env.AUTO_BACKUP_ENABLED === "true";
 
   if (!enabled) {
-    console.log("Automatic backups are disabled");
+    console.log("Los respaldos automáticos están deshabilitados");
     return;
   }
 
-  console.log(`Automatic backup scheduler started. Schedule: ${schedule}`);
+  console.log(`Programador de respaldos iniciado. Cron: ${schedule}`);
 
   cron.schedule(schedule, async () => {
     try {
-      console.log("Running scheduled backup...");
+      console.log("Ejecutando respaldo programado...");
       const backup = await createBackup("system-auto");
-      console.log(`Automatic backup created: ${backup.filename}`);
+      console.log(`Respaldo automático creado: ${backup.filename}`);
 
       // Clean old backups (retention policy)
       const retention = await cleanOldBackups(30, 90);
       console.log(
-        `Retention: ${retention.deleted} old backups deleted, ${retention.remaining} remaining`
+        `Retención: ${retention.deleted} respaldos antiguos eliminados, ${retention.remaining} restantes`
       );
     } catch (error) {
-      console.error("Scheduled backup failed:", error.message);
+      console.error("Falló el respaldo programado:", error.message);
     }
   });
 }

@@ -50,7 +50,7 @@ sequelize
 
 // Basic Route
 app.get("/", (req, res) => {
-  res.json({ message: "Bodega API is running" });
+  res.json({ message: "La API de Bodega está en ejecución" });
 });
 
 // Import Routes (to be added)

@@ -12,7 +12,7 @@ const Payments = () => {
 
   const fetchPayments = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/payments');
+      const res = await axios.get('/api/payments');
       setPayments(res.data);
       setLoading(false);
     } catch (error) {
@@ -23,24 +23,24 @@ const Payments = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-primary">Payments & Billing</h1>
+      <h1 className="text-3xl font-bold text-textMain">Pagos y facturación</h1>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border borderSoft">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="px-6 py-4 font-semibold text-gray-600">Client</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Amount</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Due Date</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Status</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Paid Date</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Cliente</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Monto</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Fecha de vencimiento</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Estado</th>
+              <th className="px-6 py-4 font-semibold text-gray-600">Fecha de pago</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
-              <tr><td colSpan="5" className="px-6 py-8 text-center">Loading...</td></tr>
+              <tr><td colSpan="5" className="px-6 py-8 text-center">Cargando...</td></tr>
             ) : payments.length === 0 ? (
-              <tr><td colSpan="5" className="px-6 py-8 text-center">No payment records found</td></tr>
+              <tr><td colSpan="5" className="px-6 py-8 text-center">No se encontraron registros de pago</td></tr>
             ) : (
               payments.map((payment) => (
                 <tr key={payment.id} className="hover:bg-gray-50">
@@ -54,7 +54,11 @@ const Payments = () => {
                       'bg-yellow-100 text-yellow-700'
                     }`}>
                       {payment.status === 'PAID' ? <CheckCircle size={12} /> : <Clock size={12} />}
-                      {payment.status}
+                      {payment.status === 'PAID'
+                        ? 'Pagado'
+                        : payment.status === 'LATE'
+                          ? 'Atrasado'
+                          : 'Pendiente'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-gray-500">

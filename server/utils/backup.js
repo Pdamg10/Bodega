@@ -35,7 +35,7 @@ async function createBackup(createdBy = "system") {
       created_by: createdBy,
     };
   } catch (error) {
-    throw new Error(`Failed to create backup: ${error.message}`);
+    throw new Error(`Error al crear respaldo: ${error.message}`);
   }
 }
 
@@ -63,7 +63,7 @@ async function listBackups() {
 
     return backups.sort((a, b) => b.created_at - a.created_at);
   } catch (error) {
-    throw new Error(`Failed to list backups: ${error.message}`);
+    throw new Error(`Error al listar respaldos: ${error.message}`);
   }
 }
 
@@ -76,7 +76,7 @@ async function restoreBackup(filename) {
   const backupPath = path.join(BACKUP_DIR, filename);
 
   if (!fs.existsSync(backupPath)) {
-    throw new Error("Backup file not found");
+    throw new Error("Archivo de respaldo no encontrado");
   }
 
   try {
@@ -86,9 +86,9 @@ async function restoreBackup(filename) {
     // Restore the backup
     await copyFile(backupPath, DB_PATH);
 
-    return { message: "Database restored successfully" };
+    return { message: "Base de datos restaurada correctamente" };
   } catch (error) {
-    throw new Error(`Failed to restore backup: ${error.message}`);
+    throw new Error(`Error al restaurar respaldo: ${error.message}`);
   }
 }
 
@@ -101,7 +101,7 @@ function getBackupPath(filename) {
   const backupPath = path.join(BACKUP_DIR, filename);
 
   if (!fs.existsSync(backupPath)) {
-    throw new Error("Backup file not found");
+    throw new Error("Archivo de respaldo no encontrado");
   }
 
   return backupPath;

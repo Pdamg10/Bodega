@@ -11,7 +11,7 @@ router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ where: { username } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "Usuario no encontrado" });
 
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
@@ -20,17 +20,17 @@ router.post("/login", async (req, res) => {
         username,
         action: "LOGIN_FAILED",
         ip_address: req.ip,
-        description: "Invalid password attempt",
+        description: "Intento de contraseña inválida",
       });
-      return res.status(401).json({ message: "Invalid password" });
+      return res.status(401).json({ message: "Contraseña inválida" });
     }
 
     if (user.status !== "active")
-      return res.status(403).json({ message: "User is inactive" });
+      return res.status(403).json({ message: "El usuario está inactivo" });
 
     const token = jwt.sign(
       { id: user.id, role: user.role },
-      process.env.JWT_SECRET || "secret_key",
+      process.env.JWT_SECRET,
       {
         expiresIn: "24h",
       }
@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
       username: user.username,
       action: "LOGIN",
       ip_address: req.ip,
-      description: "User logged in successfully",
+      description: "Usuario inició sesión correctamente",
     });
 
     res.json({ token, role: user.role, username: user.username });
@@ -71,10 +71,10 @@ router.post("/register", verifyToken, isAdmin, async (req, res) => {
       row_id: newUser.id,
       after_value: { username: newUser.username, role: newUser.role },
       ip_address: req.ip,
-      description: `Created user ${newUser.username} with role ${newUser.role}`,
+      description: `Usuario creado: ${newUser.username} con rol ${newUser.role}`,
     });
 
-    res.status(201).json({ message: "User created", user: newUser });
+    res.status(201).json({ message: "Usuario creado", user: newUser });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

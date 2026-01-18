@@ -11,21 +11,21 @@ async function exportProductsToExcel() {
 
     const data = products.map((p) => ({
       SKU: p.sku,
-      Name: p.name,
-      Description: p.description || "",
-      "Price (USD)": p.price_usd,
+      Nombre: p.name,
+      Descripción: p.description || "",
+      "Precio (USD)": p.price_usd,
       Stock: p.stock,
-      Active: p.active ? "Yes" : "No",
+      Activo: p.active ? "Sí" : "No",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Productos");
 
     const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
     return buffer;
   } catch (error) {
-    throw new Error(`Failed to export products: ${error.message}`);
+    throw new Error(`Error al exportar productos: ${error.message}`);
   }
 }
 
@@ -53,10 +53,11 @@ async function importProductsFromExcel(fileBuffer) {
 
       try {
         // Validation
-        if (!row.SKU || !row.Name) {
+        const nameValue = row.Name ?? row.Nombre;
+        if (!row.SKU || !nameValue) {
           results.errors.push({
             line: lineNumber,
-            error: "SKU and Name are required",
+            error: "SKU y Nombre son obligatorios",
             data: row,
           });
           continue;
@@ -67,29 +68,35 @@ async function importProductsFromExcel(fileBuffer) {
           where: { sku: row.SKU },
           defaults: {
             sku: row.SKU,
-            name: row.Name,
-            description: row.Description || "",
-            price_usd: parseFloat(row["Price (USD)"]) || 0,
+            name: nameValue,
+            description: row.Description ?? row["Descripción"] ?? "",
+            price_usd:
+              parseFloat(row["Price (USD)"] ?? row["Precio (USD)"]) || 0,
             stock: parseInt(row.Stock) || 0,
-            active: row.Active === "Yes",
+            active:
+              (row.Active ?? row.Activo)?.toString().toLowerCase() === "yes" ||
+              (row.Active ?? row.Activo)?.toString().toLowerCase() === "sí",
           },
         });
 
         if (!created) {
           // Update existing product
           await product.update({
-            name: row.Name,
-            description: row.Description || "",
-            price_usd: parseFloat(row["Price (USD)"]) || 0,
+            name: nameValue,
+            description: row.Description ?? row["Descripción"] ?? "",
+            price_usd:
+              parseFloat(row["Price (USD)"] ?? row["Precio (USD)"]) || 0,
             stock: parseInt(row.Stock) || 0,
-            active: row.Active === "Yes",
+            active:
+              (row.Active ?? row.Activo)?.toString().toLowerCase() === "yes" ||
+              (row.Active ?? row.Activo)?.toString().toLowerCase() === "sí",
           });
         }
 
         results.success.push({
           line: lineNumber,
           sku: row.SKU,
-          action: created ? "created" : "updated",
+          action: created ? "creado" : "actualizado",
         });
       } catch (error) {
         results.errors.push({
@@ -102,7 +109,7 @@ async function importProductsFromExcel(fileBuffer) {
 
     return results;
   } catch (error) {
-    throw new Error(`Failed to import products: ${error.message}`);
+    throw new Error(`Error al importar productos: ${error.message}`);
   }
 }
 
@@ -114,17 +121,17 @@ function generateImportTemplate() {
   const template = [
     {
       SKU: "PROD001",
-      Name: "Sample Product",
-      Description: "Product description",
-      "Price (USD)": 99.99,
+      Nombre: "Producto de ejemplo",
+      Descripción: "Descripción del producto",
+      "Precio (USD)": 99.99,
       Stock: 100,
-      Active: "Yes",
+      Activo: "Sí",
     },
   ];
 
   const worksheet = XLSX.utils.json_to_sheet(template);
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Productos");
 
   return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
 }

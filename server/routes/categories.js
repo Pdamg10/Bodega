@@ -27,9 +27,9 @@ router.post('/', verifyToken, async (req, res) => {
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const category = await Category.findByPk(req.params.id);
-    if (!category) return res.status(404).json({ message: 'Category not found' });
+    if (!category) return res.status(404).json({ message: 'Categoría no encontrada' });
     await category.destroy();
-    res.json({ message: 'Category deleted' });
+    res.json({ message: 'Categoría eliminada' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

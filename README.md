@@ -99,7 +99,6 @@ Bodega/
 │   ├── middleware/  # Auth middleware
 │   ├── utils/       # Utilities (backup, audit, etc.)
 │   └── backups/     # SQLite backups
-└── legacy_backup/   # Archived Python code
 ```
 
 ## 🔧 Configuration

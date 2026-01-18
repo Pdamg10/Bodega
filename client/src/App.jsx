@@ -13,7 +13,7 @@ import AuditLogs from './pages/AuditLogs';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Cargando...</div>;
   if (!user) return <Navigate to="/login" />;
   return children;
 };

@@ -32,7 +32,7 @@ router.post("/", verifyToken, async (req, res) => {
         price_usd: product.price_usd,
       },
       ip_address: req.ip,
-      description: `Created product ${product.name}`,
+      description: `Producto creado: ${product.name}`,
     });
 
     res.status(201).json(product);
@@ -45,7 +45,7 @@ router.post("/", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) return res.status(404).json({ message: "Producto no encontrado" });
 
     const before = {
       sku: product.sku,
@@ -71,7 +71,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       before_value: before,
       after_value: after,
       ip_address: req.ip,
-      description: `Updated product ${product.name}`,
+      description: `Producto actualizado: ${product.name}`,
     });
 
     res.json(product);
@@ -84,7 +84,7 @@ router.put("/:id", verifyToken, async (req, res) => {
 router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) return res.status(404).json({ message: "Producto no encontrado" });
 
     const productInfo = {
       sku: product.sku,
@@ -102,10 +102,10 @@ router.delete("/:id", verifyToken, isAdmin, async (req, res) => {
       row_id: req.params.id,
       before_value: productInfo,
       ip_address: req.ip,
-      description: `Deleted product ${productInfo.name}`,
+      description: `Producto eliminado: ${productInfo.name}`,
     });
 
-    res.json({ message: "Product deleted" });
+    res.json({ message: "Producto eliminado" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

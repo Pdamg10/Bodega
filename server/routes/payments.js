@@ -43,7 +43,7 @@ router.post('/', verifyToken, isAdmin, async (req, res) => {
 router.put('/:id', verifyToken, isAdmin, async (req, res) => {
   try {
     const payment = await Payment.findByPk(req.params.id);
-    if (!payment) return res.status(404).json({ message: 'Payment not found' });
+    if (!payment) return res.status(404).json({ message: 'Pago no encontrado' });
     await payment.update(req.body);
     res.json(payment);
   } catch (err) {

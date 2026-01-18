@@ -7,11 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0f172a', // Slate 900
-        secondary: '#334155', // Slate 700
-        accent: '#3b82f6', // Blue 500
-        background: '#f8fafc', // Slate 50
-        surface: '#ffffff',
+        primary: '#2563EB',      // Azul profesional
+        secondary: '#10B981',    // Verde fresco
+        accent: '#60A5FA',       // Azul claro (secundario)
+        background: '#F9FAFB',   // Gris muy claro
+        surface: '#FFFFFF',      // Blanco
+        textMain: '#1F2937',     // Gris oscuro
+        textMuted: '#6B7280',    // Gris medio para textos secundarios
+        borderSoft: '#E5E7EB',   // Borde sutil
       }
     },
   },

@@ -20,30 +20,30 @@ const Movements = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/products');
+      const res = await axios.get('/api/products');
       setProducts(res.data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error al obtener productos:', error);
     }
   };
 
   const fetchMovements = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/movements');
+      const res = await axios.get('/api/movements');
       setMovements(res.data);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching movements:', error);
+      console.error('Error al obtener movimientos:', error);
       setLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedProduct) return alert('Please select a product');
+    if (!selectedProduct) return alert('Por favor selecciona un producto');
 
     try {
-      await axios.post('http://localhost:3001/api/movements', {
+      await axios.post('/api/movements', {
         product_id: selectedProduct.id,
         type,
         quantity: parseInt(quantity),
@@ -56,11 +56,11 @@ const Movements = () => {
       setSelectedProduct(null);
       setSearchTerm('');
       fetchMovements();
-      fetchProducts(); // Update stock
-      toast.success('Transaction successful');
+      fetchProducts();
+      toast.success('Transacción registrada correctamente');
     } catch (error) {
-      console.error('Error creating movement:', error);
-      toast.error(error.response?.data?.message || 'Error creating movement');
+      console.error('Error al crear movimiento:', error);
+      toast.error(error.response?.data?.message || 'Error al crear movimiento');
     }
   };
 
@@ -71,20 +71,18 @@ const Movements = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Left Panel: New Transaction */}
       <div className="lg:col-span-1 space-y-6">
-        <h1 className="text-3xl font-bold text-primary">New Transaction</h1>
+        <h1 className="text-3xl font-bold text-textMain">Nueva transacción</h1>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Product Search */}
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Product</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Seleccionar producto</label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                 <input
                   type="text"
-                  placeholder="Search product..."
+                  placeholder="Buscar producto..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -116,12 +114,11 @@ const Movements = () => {
 
             {selectedProduct && (
               <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 flex justify-between">
-                <span>Selected: <strong>{selectedProduct.name}</strong></span>
+                <span>Seleccionado: <strong>{selectedProduct.name}</strong></span>
                 <span>Stock: {selectedProduct.stock}</span>
               </div>
             )}
 
-            {/* Transaction Type */}
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -132,7 +129,7 @@ const Movements = () => {
                   }`}
               >
                 <ArrowUpCircle size={24} />
-                <span className="font-bold">SALE (OUT)</span>
+                <span className="font-bold">VENTA (SALIDA)</span>
               </button>
               <button
                 type="button"
@@ -143,13 +140,12 @@ const Movements = () => {
                   }`}
               >
                 <ArrowDownCircle size={24} />
-                <span className="font-bold">PURCHASE (IN)</span>
+                <span className="font-bold">COMPRA (ENTRADA)</span>
               </button>
             </div>
 
-            {/* Quantity */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
               <input
                 type="number"
                 min="1"
@@ -160,9 +156,8 @@ const Movements = () => {
               />
             </div>
 
-            {/* Note */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Note (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nota (opcional)</label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -173,34 +168,33 @@ const Movements = () => {
 
             <button
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-secondary transition-colors"
+              className="w-full bg-primary text-textMain py-3 rounded-lg font-bold hover:bg-secondary transition-colors"
             >
-              Confirm Transaction
+              Confirmar transacción
             </button>
           </form>
         </div>
       </div>
 
-      {/* Right Panel: History */}
       <div className="lg:col-span-2 space-y-6">
-        <h2 className="text-2xl font-bold text-gray-700">Recent Movements</h2>
+        <h2 className="text-2xl font-bold text-gray-700">Movimientos recientes</h2>
 
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Type</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Product</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">Qty</th>
-                <th className="px-6 py-4 font-semibold text-gray-600">User</th>
+                <th className="px-6 py-4 font-semibold text-gray-600">Fecha</th>
+                <th className="px-6 py-4 font-semibold text-gray-600">Tipo</th>
+                <th className="px-6 py-4 font-semibold text-gray-600">Producto</th>
+                <th className="px-6 py-4 font-semibold text-gray-600">Cant.</th>
+                <th className="px-6 py-4 font-semibold text-gray-600">Usuario</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr><td colSpan="5" className="px-6 py-8 text-center">Loading...</td></tr>
+                <tr><td colSpan="5" className="px-6 py-8 text-center">Cargando...</td></tr>
               ) : movements.length === 0 ? (
-                <tr><td colSpan="5" className="px-6 py-8 text-center">No movements recorded</td></tr>
+                <tr><td colSpan="5" className="px-6 py-8 text-center">No hay movimientos registrados</td></tr>
               ) : (
                 movements.map((mov) => (
                   <tr key={mov.id} className="hover:bg-gray-50">

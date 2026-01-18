@@ -31,7 +31,7 @@ router.post("/", verifyToken, async (req, res) => {
     const product = await Product.findByPk(product_id, { transaction: t });
     if (!product) {
       await t.rollback();
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
 
     const oldStock = product.stock;
@@ -42,7 +42,7 @@ router.post("/", verifyToken, async (req, res) => {
     } else if (type === "OUT") {
       if (product.stock < quantity) {
         await t.rollback();
-        return res.status(400).json({ message: "Insufficient stock" });
+        return res.status(400).json({ message: "Stock insuficiente" });
       }
       product.stock -= quantity;
     } else if (type === "ADJUSTMENT") {
@@ -78,7 +78,7 @@ router.post("/", verifyToken, async (req, res) => {
         stock_after: product.stock,
       },
       ip_address: req.ip,
-      description: `${type} movement: ${quantity} units of ${product.name}`,
+      description: `Movimiento ${type === "IN" ? "de entrada" : type === "OUT" ? "de salida" : "de ajuste"}: ${quantity} unidades de ${product.name}`,
     });
 
     await t.commit();

@@ -52,9 +52,9 @@ async function cleanOldBackups(maxBackups = 30, maxAgeDays = 90) {
     for (const backup of toDelete) {
       await unlink(backup.path);
       console.log(
-        `Deleted old backup: ${backup.filename} (age: ${backup.age.toFixed(
+        `Respaldo antiguo eliminado: ${backup.filename} (edad: ${backup.age.toFixed(
           1
-        )} days)`
+        )} días)`
       );
     }
 
@@ -64,7 +64,7 @@ async function cleanOldBackups(maxBackups = 30, maxAgeDays = 90) {
       remaining: backups.length - toDelete.length,
     };
   } catch (error) {
-    console.error("Error cleaning old backups:", error);
+    console.error("Error al limpiar respaldos antiguos:", error);
     throw error;
   }
 }

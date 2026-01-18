@@ -57,7 +57,7 @@ router.post(
   async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+        return res.status(400).json({ message: "No se subió ningún archivo" });
       }
 
       const results = await importProductsFromExcel(req.file.buffer);

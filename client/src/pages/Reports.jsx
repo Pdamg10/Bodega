@@ -15,7 +15,7 @@ const Reports = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/reports/stats');
+      const res = await axios.get('/api/reports/stats');
       setStats(res.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -24,7 +24,7 @@ const Reports = () => {
 
   const fetchSales = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/reports/sales');
+      const res = await axios.get('/api/reports/sales');
       // Process data for charts - Group by date
       const processed = res.data.reduce((acc, curr) => {
         const date = new Date(curr.date).toLocaleDateString();
@@ -44,31 +44,31 @@ const Reports = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-primary">Reports & Analytics</h1>
+      <h1 className="text-3xl font-bold text-textMain">Reportes y analítica</h1>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
-          <p className="text-gray-500 text-sm font-medium">Total Products</p>
-          <p className="text-3xl font-bold text-primary mt-2">{stats.totalProducts}</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
+          <p className="text-gray-500 text-sm font-medium">Total de productos</p>
+          <p className="text-3xl font-bold text-textMain mt-2">{stats.totalProducts}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
-          <p className="text-gray-500 text-sm font-medium">Low Stock Items</p>
-          <p className="text-3xl font-bold text-primary mt-2">{stats.lowStock}</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
+          <p className="text-gray-500 text-sm font-medium">Productos con bajo stock</p>
+          <p className="text-3xl font-bold text-textMain mt-2">{stats.lowStock}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-green-500">
-          <p className="text-gray-500 text-sm font-medium">Total Sales Transactions</p>
-          <p className="text-3xl font-bold text-primary mt-2">{stats.totalSalesCount}</p>
+        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
+          <p className="text-gray-500 text-sm font-medium">Total de transacciones de venta</p>
+          <p className="text-3xl font-bold text-textMain mt-2">{stats.totalSalesCount}</p>
         </div>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Sales Trend */}
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
           <h3 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
             <Calendar size={20} className="text-accent" />
-            Sales Trend (USD)
+            Tendencia de ventas (USD)
           </h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -78,17 +78,17 @@ const Reports = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="sales" stroke="#3b82f6" strokeWidth={2} />
+                <Line type="monotone" dataKey="sales" stroke="#2563EB" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Quantity Trend */}
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
           <h3 className="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
             <Calendar size={20} className="text-accent" />
-            Items Sold
+            Artículos vendidos
           </h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
