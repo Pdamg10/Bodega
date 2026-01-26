@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 
 import { useTheme } from '../context/ThemeContext';
+import BrandIcon from '../components/BrandIcon';
 
 const Layout = () => {
   const { user, logout, warningActive, secondsLeft } = useAuth();
@@ -74,20 +75,20 @@ const Layout = () => {
         <>
           {/* User Menu Items... */}
           <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Menu</div>
-          <Link to="/dashboard" className={linkClass('/dashboard')} onClick={() => setMobileMenuOpen(false)}>
-            <LayoutDashboard size={20} /> Inicio
+          <Link to="/inventory" className={linkClass('/inventory')} onClick={() => setMobileMenuOpen(false)}>
+            <Package size={20} /> Inventario
           </Link>
           <Link to="/sales" className={linkClass('/sales')} onClick={() => setMobileMenuOpen(false)}>
             <ShoppingCart size={20} /> Ventas
-          </Link>
-          <Link to="/inventory" className={linkClass('/inventory')} onClick={() => setMobileMenuOpen(false)}>
-            <Package size={20} /> Inventario
           </Link>
           <Link to="/clients" className={linkClass('/clients')} onClick={() => setMobileMenuOpen(false)}>
             <Users size={20} /> Clientes
           </Link>
           <Link to="/reports" className={linkClass('/reports')} onClick={() => setMobileMenuOpen(false)}>
             <BarChart3 size={20} /> Reportes
+          </Link>
+          <Link to="/dashboard" className={linkClass('/dashboard')} onClick={() => setMobileMenuOpen(false)}>
+            <LayoutDashboard size={20} /> Inicio
           </Link>
         </>
       )}
@@ -110,8 +111,10 @@ const Layout = () => {
     <>
       <div className="flex items-center justify-between mb-10 px-2">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
-          <h1 className="text-xl font-bold text-white">Bodega System</h1>
+          <div className="w-8 h-8 rounded-lg overflow-hidden">
+            <BrandIcon size={32} />
+          </div>
+          <h1 className="text-xl font-bold text-white">Invexis</h1>
         </div>
         <button
           onClick={toggleTheme}
@@ -131,7 +134,7 @@ const Layout = () => {
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Mobile Header Bar */}
       <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4 justify-between">
-        <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Bodega System</span>
+        <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Invexis</span>
         <button
           onClick={toggleTheme}
           className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
@@ -162,8 +165,10 @@ const Layout = () => {
         {/* Mobile Sidebar Header with Close Button */}
         <div className="flex items-center justify-between mb-6 px-2">
             <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
-                <h1 className="text-xl font-bold text-white">Bodega System</h1>
+                <div className="w-8 h-8 rounded-lg overflow-hidden">
+                  <BrandIcon size={32} />
+                </div>
+                <h1 className="text-xl font-bold text-white">Invexis</h1>
             </div>
             <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white transition-colors">
                 <X size={24} />
@@ -173,6 +178,7 @@ const Layout = () => {
         <SidebarNav />
         <SidebarFooter />
       </div>
+
 
       <main className="flex-1 overflow-auto w-full pt-20 lg:pt-0">
         <Outlet />

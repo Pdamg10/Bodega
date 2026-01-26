@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Lock, User, Eye, EyeOff, Moon, Sun, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, Moon, Sun, ArrowRight } from 'lucide-react';
+import BrandIcon from '../components/BrandIcon';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -24,10 +25,7 @@ const Login = () => {
     }
   };
 
-  const fillDemoCredentials = () => {
-    setUsername('admin');
-    setPassword('admin123');
-  };
+  // Demo button removido
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-300 relative">
@@ -43,19 +41,11 @@ const Login = () => {
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden transition-colors duration-300 dark:border dark:border-slate-700">
           <div className="p-8 pb-6">
             <div className="flex flex-col items-center mb-8">
-              <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-600/30">
-                <Lock className="text-white" size={32} />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4">
+                <BrandIcon size={64} />
               </div>
-              <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Sistema de Inventario</h1>
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Invexis</h1>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Ingresa tus credenciales para acceder</p>
-              
-              <button
-                onClick={fillDemoCredentials}
-                className="mt-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
-              >
-                <ShieldCheck size={14} />
-                Credenciales Demo
-              </button>
             </div>
 
             {error && (

@@ -38,7 +38,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Layout />}>
         <Route index element={
-          user?.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />
+          user?.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/inventory" />
         } />
         
         {/* Admin Routes */}
