@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, Outlet, Navigate } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Package, Users, BarChart3, LogOut, Shield, Database, Settings, Menu, X, UserCog } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, Users, BarChart3, LogOut, Shield, Database, Settings, Menu, X, UserCog, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../config/api';
 
 import { useTheme } from '../context/ThemeContext';
 
 const Layout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, warningActive, secondsLeft } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,26 +62,9 @@ const Layout = () => {
             <Shield size={20} /> Dashboard
           </Link>
           
-          <div className="relative">
-            <button 
-              onClick={() => setBackupMenuOpen(!backupMenuOpen)} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${backupMenuOpen ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
-            >
-              <Database size={20} /> Respaldo
-            </button>
-            
-            {backupMenuOpen && (
-              <div className="absolute left-0 right-0 mt-2 bg-slate-800 rounded-xl overflow-hidden shadow-xl border border-slate-700 z-10 animate-in fade-in slide-in-from-top-2">
-                <button onClick={handleDownloadBackup} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                  Crear Respaldo
-                </button>
-                <label className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer block">
-                  Subir Respaldo
-                  <input type="file" accept=".json" onChange={handleRestoreBackup} className="hidden" />
-                </label>
-              </div>
-            )}
-          </div>
+          <Link to="/admin/backup" className={linkClass('/admin/backup')} onClick={() => setMobileMenuOpen(false)}>
+            <Database size={20} /> Respaldo
+          </Link>
 
           <Link to="/admin/settings" className={linkClass('/admin/settings')} onClick={() => setMobileMenuOpen(false)}>
             <Settings size={20} /> Configuración
@@ -125,9 +108,19 @@ const Layout = () => {
 
   const SidebarContent = () => (
     <>
-      <div className="flex items-center gap-3 mb-10 px-2">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
-        <h1 className="text-xl font-bold text-white">Bodega System</h1>
+      <div className="flex items-center justify-between mb-10 px-2">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
+          <h1 className="text-xl font-bold text-white">Bodega System</h1>
+        </div>
+        <button
+          onClick={toggleTheme}
+          className="inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-slate-800 text-slate-200"
+          aria-label="Cambiar tema"
+          title="Cambiar tema"
+        >
+          {darkMode ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
       </div>
       <SidebarNav />
       <SidebarFooter />
@@ -137,8 +130,16 @@ const Layout = () => {
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       {/* Mobile Header Bar */}
-      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4">
+      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4 justify-between">
         <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Bodega System</span>
+        <button
+          onClick={toggleTheme}
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
+          aria-label="Cambiar tema"
+          title="Cambiar tema"
+        >
+          {darkMode ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
       </div>
 
       {/* Mobile Menu Button - Only show when menu is CLOSED */}
@@ -175,6 +176,11 @@ const Layout = () => {
 
       <main className="flex-1 overflow-auto w-full pt-20 lg:pt-0">
         <Outlet />
+        {warningActive && (
+          <div className="fixed bottom-4 right-4 z-50 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-xl shadow">
+            Se cerrará sesión por inactividad en {secondsLeft}s
+          </div>
+        )}
       </main>
     </div>
   );

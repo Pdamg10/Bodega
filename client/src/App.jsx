@@ -11,6 +11,7 @@ import Clients from './pages/Clients';
 import Reports from './pages/Reports';
 import Layout from './layouts/Layout';
 import Settings from './pages/Settings';
+import Backup from './pages/Backup';
 
 const RoleRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -42,6 +43,7 @@ const AppRoutes = () => {
         
         {/* Admin Routes */}
         <Route path="admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+        <Route path="admin/backup" element={<RoleRoute role="admin"><Backup /></RoleRoute>} />
         <Route path="admin/settings" element={<RoleRoute role="admin"><Settings /></RoleRoute>} />
         
         {/* User Routes */}

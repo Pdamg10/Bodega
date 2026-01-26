@@ -7,18 +7,45 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const logoutTimer = useRef(null);
+  const warnTimer = useRef(null);
+  const countdownRef = useRef(null);
+  const [warningActive, setWarningActive] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(0);
 
-  // Inactivity timeout duration (1 minute = 60000ms)
-  const INACTIVITY_LIMIT = 60000;
+  // Inactivity timeout duration: 5 minutes
+  const INACTIVITY_LIMIT = 300000;
+  const WARNING_BEFORE_MS = 30000;
 
   const resetInactivityTimer = () => {
     if (logoutTimer.current) {
       clearTimeout(logoutTimer.current);
     }
+    if (warnTimer.current) {
+      clearTimeout(warnTimer.current);
+    }
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setWarningActive(false);
+    setSecondsLeft(0);
     if (user) {
       logoutTimer.current = setTimeout(() => {
         logout();
       }, INACTIVITY_LIMIT);
+      warnTimer.current = setTimeout(() => {
+        setWarningActive(true);
+        setSecondsLeft(Math.floor(WARNING_BEFORE_MS / 1000));
+        countdownRef.current = setInterval(() => {
+          setSecondsLeft(prev => {
+            const next = prev - 1;
+            if (next <= 0) {
+              clearInterval(countdownRef.current);
+            }
+            return next;
+          });
+        }, 1000);
+      }, INACTIVITY_LIMIT - WARNING_BEFORE_MS);
     }
   };
 
@@ -71,10 +98,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('user');
     if (logoutTimer.current) clearTimeout(logoutTimer.current);
+    if (warnTimer.current) clearTimeout(warnTimer.current);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    setWarningActive(false);
+    setSecondsLeft(0);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, warningActive, secondsLeft }}>
       {children}
     </AuthContext.Provider>
   );

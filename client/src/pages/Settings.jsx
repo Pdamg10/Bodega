@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import api from '../config/api';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { UserCog, Save, CheckCircle, AlertTriangle, Moon, Sun, Palette } from 'lucide-react';
+import { UserCog, Save, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const Settings = () => {
   const { user } = useAuth();
-  const { darkMode, toggleTheme } = useTheme();
   const [adminData, setAdminData] = useState({ username: '', newPassword: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
 
@@ -30,26 +28,7 @@ const Settings = () => {
         <p className="text-slate-500 dark:text-slate-400">Administra tu cuenta y preferencias</p>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden mb-6">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
-          <Palette size={24} className="text-purple-600" />
-          <h2 className="text-lg font-bold text-slate-800 dark:text-white">Apariencia</h2>
-        </div>
-        <div className="p-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-slate-800 dark:text-white">Tema de la interfaz</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Selecciona tu preferencia visual</p>
-            </div>
-            <button 
-              onClick={toggleTheme}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-            >
-              {darkMode ? <><Moon size={20} /> Modo Oscuro</> : <><Sun size={20} /> Modo Claro</>}
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../config/api';
 import { useTheme } from '../context/ThemeContext';
-import { Users, UserPlus, Search, Edit, Trash2, Save, X, AlertTriangle, Moon, Sun, Bell } from 'lucide-react';
+import { Users, UserPlus, Search, Edit, Trash2, Save, X, AlertTriangle, Bell } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -136,7 +136,6 @@ const AdminDashboard = () => {
           <p className="text-slate-500 dark:text-slate-400">Administra el acceso y facturación de tus clientes</p>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          
           <button
             onClick={() => setShowModal(true)}
             className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors font-bold shadow-lg shadow-blue-600/20"
@@ -144,14 +143,6 @@ const AdminDashboard = () => {
             <UserPlus size={20} />
             <span className="hidden sm:inline">Nuevo Usuario</span>
             <span className="sm:hidden">Nuevo</span>
-          </button>
-
-          <button 
-            onClick={toggleTheme}
-            className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
-            title="Cambiar Tema"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
       </div>
@@ -264,7 +255,7 @@ const AdminDashboard = () => {
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
                       <input type="number" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 pl-7 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                        value={formData.paymentAmount} onChange={e => setFormData({...formData, paymentAmount: parseFloat(e.target.value)})} />
+                        value={formData.paymentAmount ?? ''} onChange={e => setFormData({...formData, paymentAmount: e.target.value === '' ? '' : Number(e.target.value)})} />
                     </div>
                   </div>
                   <div>
