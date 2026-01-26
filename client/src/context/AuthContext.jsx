@@ -4,6 +4,10 @@ import api from '../config/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const ALLOW_DEMO = import.meta.env?.VITE_DEMO_LOGIN === 'true';
+  const DEMO_USER = import.meta.env?.VITE_DEMO_USER || 'admin';
+  const DEMO_PASS = import.meta.env?.VITE_DEMO_PASS || 'admin123';
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const logoutTimer = useRef(null);
@@ -90,6 +94,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       return { success: true };
     } catch (error) {
+      if (ALLOW_DEMO && username === DEMO_USER && password === DEMO_PASS) {
+        const demoUser = { id: 1, username: DEMO_USER, role: 'admin', access_token: 'demo_token' };
+        setUser(demoUser);
+        localStorage.setItem('user', JSON.stringify(demoUser));
+        return { success: true };
+      }
       return { success: false, message: error.response?.data?.message || 'Error al iniciar sesión' };
     }
   };
