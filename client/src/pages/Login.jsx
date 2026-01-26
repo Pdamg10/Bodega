@@ -1,88 +1,112 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { Lock, User, Eye, EyeOff, Moon, Sun, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
+  const { darkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const result = await login(username, password);
-    if (result.success) {
-      navigate('/inventory');
+    const res = await login(username, password);
+    if (res.success) {
+      navigate('/');
     } else {
-      setError(result.message);
+      setError(res.message);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-secondary">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="bg-primary px-8 pt-10 pb-8 text-center">
-          <h1 className="text-3xl font-bold text-white tracking-wide">BODEGA</h1>
-          <p className="text-white/90 mt-1">Sistema de inventario</p>
-        </div>
-        <div className="px-8 pt-8 pb-6 border-t borderSoft">
-          <h2 className="text-xl font-semibold text-textMain mb-6">Iniciar sesión</h2>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
+  const fillDemoCredentials = () => {
+    setUsername('admin');
+    setPassword('admin123');
+  };
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-textMain mb-1">Usuario</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Ingresa tu usuario"
-              className="w-full px-4 py-2 border borderSoft rounded-lg bg-gray-50 text-textMain placeholder:text-textMuted focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-textMain mb-1">Contraseña</label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Ingresa tu contraseña"
-                className="w-full px-4 py-2 pr-20 border borderSoft rounded-lg bg-gray-50 text-textMain placeholder:text-textMuted focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition"
-                required
-              />
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-300 relative">
+      {/* Theme Toggle Button */}
+      <button 
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 p-2 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-lg hover:scale-110 transition-all border dark:border-slate-700"
+      >
+        {darkMode ? <Sun size={24} /> : <Moon size={24} />}
+      </button>
+
+      <div className="w-full max-w-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden transition-colors duration-300 dark:border dark:border-slate-700">
+          <div className="p-8 pb-6">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-600/30">
+                <Lock className="text-white" size={32} />
+              </div>
+              <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Sistema de Inventario</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Ingresa tus credenciales para acceder</p>
+              
               <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-2 my-1 px-3 text-sm font-medium rounded-lg text-textMuted hover:text-textMain hover:bg-gray-100 transition"
+                onClick={fillDemoCredentials}
+                className="mt-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
               >
-                {showPassword ? 'Ocultar' : 'Mostrar'}
+                <ShieldCheck size={14} />
+                Credenciales Demo
               </button>
             </div>
-          </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 rounded-lg font-semibold text-white bg-primary hover:bg-primary/90 active:scale-[0.99] shadow-md transition"
-            >
-            Ingresar
-          </button>
-        </form>
-          <div className="mt-8 text-center text-sm text-textMuted">
-            ¿Problemas para ingresar?{' '}
-            <a href="#" className="font-semibold text-primary hover:text-accent transition">
-              Contactar soporte
-            </a>
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg mb-6 text-sm text-center border border-red-100 dark:border-red-900/30">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Usuario</label>
+                <div className="relative group">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-10 pr-4 text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    placeholder="Ingrese su usuario"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Contraseña</label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-3 pl-10 pr-10 text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 flex items-center justify-center gap-2 mt-2"
+              >
+                Iniciar Sesión <ArrowRight size={20} />
+              </button>
+            </form>
           </div>
         </div>
       </div>

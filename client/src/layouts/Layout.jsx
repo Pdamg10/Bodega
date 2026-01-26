@@ -1,113 +1,179 @@
-import React from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, Outlet, Navigate } from 'react-router-dom';
+import { LayoutDashboard, ShoppingCart, Package, Users, BarChart3, LogOut, Shield, Database, Settings, Menu, X, UserCog } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Package, ShoppingCart, DollarSign, BarChart3, LogOut, Users, FileText } from 'lucide-react';
+import api from '../config/api';
+
+import { useTheme } from '../context/ThemeContext';
 
 const Layout = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { darkMode, toggleTheme } = useTheme();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [backupMenuOpen, setBackupMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  if (!user) return <Navigate to="/login" />;
 
   const isActive = (path) => location.pathname === path;
+  const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
+
+  const handleDownloadBackup = async () => {
+    try {
+      const response = await api.get('/backup', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'backup.json');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setBackupMenuOpen(false);
+    } catch (error) {
+      alert('Error al generar el respaldo');
+    }
+  };
+
+  const handleRestoreBackup = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const jsonData = JSON.parse(e.target.result);
+        await api.post('/restore', jsonData);
+        alert('Respaldo restaurado exitosamente');
+        setBackupMenuOpen(false);
+        window.location.reload();
+      } catch (error) {
+        alert('Error al restaurar el respaldo');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const SidebarNav = () => (
+    <nav className="flex-1 space-y-2">
+      {user.role === 'admin' ? (
+        <>
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Admin</div>
+          <Link to="/admin" className={linkClass('/admin')} onClick={() => setMobileMenuOpen(false)}>
+            <Shield size={20} /> Dashboard
+          </Link>
+          
+          <div className="relative">
+            <button 
+              onClick={() => setBackupMenuOpen(!backupMenuOpen)} 
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${backupMenuOpen ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+            >
+              <Database size={20} /> Respaldo
+            </button>
+            
+            {backupMenuOpen && (
+              <div className="absolute left-0 right-0 mt-2 bg-slate-800 rounded-xl overflow-hidden shadow-xl border border-slate-700 z-10 animate-in fade-in slide-in-from-top-2">
+                <button onClick={handleDownloadBackup} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
+                  Crear Respaldo
+                </button>
+                <label className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer block">
+                  Subir Respaldo
+                  <input type="file" accept=".json" onChange={handleRestoreBackup} className="hidden" />
+                </label>
+              </div>
+            )}
+          </div>
+
+          <Link to="/admin/settings" className={linkClass('/admin/settings')} onClick={() => setMobileMenuOpen(false)}>
+            <Settings size={20} /> Configuración
+          </Link>
+        </>
+      ) : (
+        <>
+          {/* User Menu Items... */}
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Menu</div>
+          <Link to="/dashboard" className={linkClass('/dashboard')} onClick={() => setMobileMenuOpen(false)}>
+            <LayoutDashboard size={20} /> Inicio
+          </Link>
+          <Link to="/sales" className={linkClass('/sales')} onClick={() => setMobileMenuOpen(false)}>
+            <ShoppingCart size={20} /> Ventas
+          </Link>
+          <Link to="/inventory" className={linkClass('/inventory')} onClick={() => setMobileMenuOpen(false)}>
+            <Package size={20} /> Inventario
+          </Link>
+          <Link to="/clients" className={linkClass('/clients')} onClick={() => setMobileMenuOpen(false)}>
+            <Users size={20} /> Clientes
+          </Link>
+          <Link to="/reports" className={linkClass('/reports')} onClick={() => setMobileMenuOpen(false)}>
+            <BarChart3 size={20} /> Reportes
+          </Link>
+        </>
+      )}
+    </nav>
+  );
+
+  const SidebarFooter = () => (
+    <div className="pt-6 border-t border-slate-800 mt-auto">
+      <div className="px-4 mb-4">
+        <p className="text-sm font-medium text-white">{user.username}</p>
+        <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+      </div>
+      <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-colors">
+        <LogOut size={20} /> Cerrar Sesión
+      </button>
+    </div>
+  );
+
+  const SidebarContent = () => (
+    <>
+      <div className="flex items-center gap-3 mb-10 px-2">
+        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
+        <h1 className="text-xl font-bold text-white">Bodega System</h1>
+      </div>
+      <SidebarNav />
+      <SidebarFooter />
+    </>
+  );
 
   return (
-    <div className="flex h-screen bg-background text-textMain">
-      {/* Sidebar */}
-      <aside className="w-64 bg-surface text-textMain flex flex-col border-r borderSoft">
-        <div className="p-6 bg-primary text-white">
-          <h1 className="text-2xl font-bold tracking-wider">BODEGA</h1>
-          <p className="text-sm opacity-80 mt-1">Sistema de inventario</p>
-        </div>
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      {/* Mobile Header Bar */}
+      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4">
+        <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Bodega System</span>
+      </div>
 
-        <nav className="flex-1 px-4 space-y-2 mt-4">
-          {user?.role === 'admin' && (
-            <Link
-              to="/admin"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-                }`}
-            >
-              <LayoutDashboard size={20} />
-              Panel admin
-            </Link>
-          )}
+      {/* Mobile Menu Button - Only show when menu is CLOSED */}
+      {!mobileMenuOpen && (
+        <button 
+          className="lg:hidden fixed top-3 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg hover:bg-slate-800 transition-colors"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <Menu size={24} />
+        </button>
+      )}
 
-          <Link
-            to="/inventory"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/inventory') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-              }`}
-          >
-            <Package size={20} />
-            Inventario
-          </Link>
-
-          <Link
-            to="/movements"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/movements') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-              }`}
-          >
-            <ShoppingCart size={20} />
-            Movimientos
-          </Link>
-
-          {user?.role === 'admin' && (
-            <Link
-              to="/payments"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/payments') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-                }`}
-            >
-              <DollarSign size={20} />
-              Pagos
-            </Link>
-          )}
-
-          {user?.role === 'admin' && (
-            <Link
-              to="/audit-logs"
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/audit-logs') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-                }`}
-            >
-              <FileText size={20} />
-              Registros de auditoría
-            </Link>
-          )}
-
-          <Link
-            to="/reports"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/reports') ? 'bg-accent/20 text-primary border border-accent' : 'text-textMain hover:bg-accent/10'
-              }`}
-          >
-            <BarChart3 size={20} />
-            Reportes
-          </Link>
-        </nav>
-
-        <div className="p-4 border-t borderSoft">
-          <div className="flex items-center gap-3 px-4 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-              {user?.username?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <p className="text-sm font-medium">{user?.username}</p>
-              <p className="text-xs text-textMuted capitalize">{user?.role}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-2 text-primary hover:bg-accent/10 rounded-lg transition-colors"
-          >
-            <LogOut size={18} />
-            Cerrar sesión
-          </button>
-        </div>
+      {/* Sidebar for Desktop */}
+      <aside className="hidden lg:flex w-64 bg-slate-900 flex-col p-6 h-full">
+        <SidebarContent />
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-8 bg-background">
+      {/* Sidebar for Mobile */}
+      <div className={`fixed inset-y-0 left-0 w-64 bg-slate-900 z-50 p-6 flex flex-col transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
+        {/* Mobile Sidebar Header with Close Button */}
+        <div className="flex items-center justify-between mb-6 px-2">
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B</div>
+                <h1 className="text-xl font-bold text-white">Bodega System</h1>
+            </div>
+            <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <X size={24} />
+            </button>
+        </div>
+
+        <SidebarNav />
+        <SidebarFooter />
+      </div>
+
+      <main className="flex-1 overflow-auto w-full pt-20 lg:pt-0">
         <Outlet />
       </main>
     </div>

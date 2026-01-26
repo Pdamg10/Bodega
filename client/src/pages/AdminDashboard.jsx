@@ -1,243 +1,290 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { API_URL } from '../config/api';
-import { Users, UserPlus, Shield, Database, Download, RefreshCw, AlertTriangle } from 'lucide-react';
-import { toast } from 'sonner';
+import api from '../config/api';
+import { useTheme } from '../context/ThemeContext';
+import { Users, UserPlus, Search, Edit, Trash2, Save, X, AlertTriangle, Moon, Sun, Bell } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user');
-  const [message, setMessage] = useState('');
-  const [backups, setBackups] = useState([]);
-  const [loadingBackups, setLoadingBackups] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const { darkMode, toggleTheme } = useTheme();
+  const [notifications, setNotifications] = useState([]);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    role: 'user',
+    firstName: '',
+    lastName: '',
+    cedula: '',
+    phone: '',
+    email: '',
+    paymentMethod: 'Efectivo',
+    paymentAmount: 0,
+    startDate: '',
+    cutoffDate: ''
+  });
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
-    fetchBackups();
+    fetchUsers();
   }, []);
 
-  const fetchBackups = async () => {
-    setLoadingBackups(true);
+  const fetchUsers = async () => {
     try {
-      const res = await axios.get('/api/backups');
-      setBackups(res.data);
+      const res = await api.get('/users');
+      setUsers(res.data);
+      checkNotifications(res.data);
     } catch (error) {
-      console.error('Error al obtener respaldos:', error);
+      console.error('Error fetching users', error);
+    } finally {
+      setLoading(false);
     }
-    setLoadingBackups(false);
   };
 
-  const handleCreateUser = async (e) => {
+  const checkNotifications = (usersData) => {
+    const today = new Date();
+    const alerts = [];
+    usersData.forEach(user => {
+      if (user.cutoffDate) {
+        const cutoff = new Date(user.cutoffDate);
+        const diffTime = cutoff - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays >= 0 && diffDays <= 5) {
+          alerts.push({
+            id: user.id,
+            message: `El usuario ${user.firstName} ${user.lastName} tiene corte en ${diffDays} días.`
+          });
+        }
+      }
+    });
+    setNotifications(alerts);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/auth/register', {
-        username,
-        password,
-        role,
-      });
-      setMessage('Usuario creado correctamente');
-      setUsername('');
-      setPassword('');
+      if (editingId) {
+        await api.put(`/users/${editingId}`, formData);
+      } else {
+        await api.post('/users', formData);
+      }
+      setShowModal(false);
+      fetchUsers();
+      resetForm();
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error al crear usuario');
+      alert('Error al guardar usuario');
     }
   };
 
-  const handleCreateBackup = async () => {
-    try {
-      await axios.post('/api/backups');
-      toast.success('Respaldo creado correctamente');
-      fetchBackups();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error al crear respaldo');
+  const handleEdit = (user) => {
+    setFormData({
+      ...user,
+      password: '' // Don't show password, require new one only if changing
+    });
+    setEditingId(user.id);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
+      try {
+        await api.delete(`/users/${id}`);
+        fetchUsers();
+      } catch (error) {
+        alert('Error al eliminar usuario');
+      }
     }
   };
 
-  const handleDownloadBackup = (filename) => {
-    window.open(`${API_URL}/api/backups/download/${filename}`, '_blank');
-  };
-
-  const handleRestoreBackup = async (filename) => {
-    if (!window.confirm('⚠️ ATENCIÓN: Esto reemplazará la base de datos actual. ¿Estás seguro?')) {
-      return;
-    }
-
-    if (!window.confirm('Esta acción no se puede deshacer. Se creará un respaldo de seguridad. ¿Continuar?')) {
-      return;
-    }
-
-    try {
-      await axios.post(`/api/backups/restore/${filename}`);
-      toast.success('✅ Base de datos restaurada correctamente. Recargando página...');
-      setTimeout(() => window.location.reload(), 1500);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error al restaurar respaldo');
-    }
-  };
-
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 bytes';
-    const k = 1024;
-    const sizes = ['bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      password: '',
+      role: 'user',
+      firstName: '',
+      lastName: '',
+      cedula: '',
+      phone: '',
+      email: '',
+      paymentMethod: 'Efectivo',
+      paymentAmount: 0,
+      startDate: '',
+      cutoffDate: ''
+    });
+    setEditingId(null);
   };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-textMain">Panel de administración</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
-          <h2 className="text-xl font-bold text-gray-700 mb-6 flex items-center gap-2">
-            <UserPlus size={24} className="text-accent" />
-            Crear nuevo usuario
-          </h2>
-
-          {message && (
-            <div className={`p-4 rounded-lg mb-4 ${message.includes('correctamente') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-              {message}
+    <div className="p-4 md:p-8 max-w-7xl mx-auto transition-colors duration-300">
+      
+      {/* Notifications Area */}
+      {notifications.length > 0 && (
+        <div className="mb-6 space-y-2">
+          {notifications.map((note, index) => (
+            <div key={index} className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-4 rounded-xl flex items-center gap-3 text-yellow-800 dark:text-yellow-200 animate-in fade-in slide-in-from-top-4">
+              <AlertTriangle className="shrink-0" size={20} />
+              <p className="font-medium">{note.message}</p>
             </div>
-          )}
-
-          <form onSubmit={handleCreateUser} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent outline-none"
-              >
-                <option value="user">Usuario</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-accent transition-colors"
-            >
-              Crear usuario
-            </button>
-          </form>
+          ))}
         </div>
+      )}
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
-          <h2 className="text-xl font-bold text-gray-700 mb-6 flex items-center gap-2">
-            <Shield size={24} className="text-accent" />
-            Estado del sistema
-          </h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Base de datos</span>
-              <span className="text-secondary font-bold">Conectada</span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Servicio de respaldos</span>
-              <span className="text-secondary font-bold">Activo</span>
-            </div>
-            <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-              <span className="text-gray-600">Total de respaldos</span>
-              <span className="text-gray-800 font-mono">{backups.length}</span>
-            </div>
-          </div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Gestión de Usuarios</h1>
+          <p className="text-slate-500 dark:text-slate-400">Administra el acceso y facturación de tus clientes</p>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors font-bold shadow-lg shadow-blue-600/20"
+          >
+            <UserPlus size={20} />
+            <span className="hidden sm:inline">Nuevo Usuario</span>
+            <span className="sm:hidden">Nuevo</span>
+          </button>
+
+          <button 
+            onClick={toggleTheme}
+            className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            title="Cambiar Tema"
+          >
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm border borderSoft">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-700 flex items-center gap-2">
-            <Database size={24} className="text-accent" />
-            Respaldos de base de datos
-          </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={fetchBackups}
-              className="px-4 py-2 bg-secondary text-white rounded-lg flex items-center gap-2 transition-colors hover:bg-secondary/90"
-            >
-              <RefreshCw size={18} />
-              Actualizar
-            </button>
-            <button
-              onClick={handleCreateBackup}
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-accent flex items-center gap-2 transition-colors"
-            >
-              <Database size={18} />
-              Crear respaldo
-            </button>
-          </div>
-        </div>
-
-        <div className="overflow-hidden border borderSoft rounded-lg">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+        <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
               <tr>
-                <th className="px-6 py-3 font-semibold text-gray-600">Archivo</th>
-                <th className="px-6 py-3 font-semibold text-gray-600">Tamaño</th>
-                <th className="px-6 py-3 font-semibold text-gray-600">Creado</th>
-                <th className="px-6 py-3 font-semibold text-gray-600 text-right">Acciones</th>
+                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Usuario</th>
+                <th className="hidden md:table-cell px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Nombre Completo</th>
+                <th className="hidden lg:table-cell px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Contacto</th>
+                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Plan</th>
+                <th className="hidden sm:table-cell px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">Estado</th>
+                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {loadingBackups ? (
-                <tr><td colSpan="4" className="px-6 py-8 text-center">Cargando respaldos...</td></tr>
-              ) : backups.length === 0 ? (
-                <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-500">No hay respaldos. Crea el primero con el botón superior.</td></tr>
-              ) : (
-                backups.map((backup, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 font-mono text-sm text-gray-700">{backup.filename}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{formatBytes(backup.size)}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(backup.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleDownloadBackup(backup.filename)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Descargar"
-                        >
-                          <Download size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleRestoreBackup(backup.filename)}
-                          className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                          title="Restaurar (PELIGRO)"
-                        >
-                          <AlertTriangle size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-slate-900 dark:text-white">{user.username}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 uppercase">{user.role}</div>
+                    <div className="md:hidden text-xs text-slate-500 mt-1">{user.firstName} {user.lastName}</div>
+                  </td>
+                  <td className="hidden md:table-cell px-6 py-4">
+                    <div className="text-slate-900 dark:text-white">{user.firstName} {user.lastName}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{user.cedula}</div>
+                  </td>
+                  <td className="hidden lg:table-cell px-6 py-4">
+                    <div className="text-sm text-slate-600 dark:text-slate-300">{user.email}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{user.phone}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-bold text-slate-700 dark:text-slate-200">${user.paymentAmount}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      Corte: {user.cutoffDate ? new Date(user.cutoffDate).toLocaleDateString() : '-'}
+                    </div>
+                  </td>
+                  <td className="hidden sm:table-cell px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                      {user.isActive ? 'Activo' : 'Suspendido'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right space-x-2">
+                    <button onClick={() => handleEdit(user)} className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Editar">
+                      <Edit size={18} />
+                    </button>
+                    <button onClick={() => handleDelete(user.id)} className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Eliminar">
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 dark:border-slate-700">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-800 z-10">
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white">{editingId ? 'Editar Usuario' : 'Nuevo Usuario'}</h2>
+              <button onClick={() => { setShowModal(false); resetForm(); }} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Usuario</label>
+                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Contraseña {editingId && '(Dejar vacío para mantener)'}</label>
+                  <input type="password" required={!editingId} className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
+                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Apellido</label>
+                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cédula</label>
+                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Teléfono</label>
+                  <input type="text" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                </div>
+              </div>
+              
+              <div className="border-t border-slate-100 dark:border-slate-700 pt-4 mt-4">
+                <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                   Facturación
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Monto Mensual</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                      <input type="number" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 pl-7 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                        value={formData.paymentAmount} onChange={e => setFormData({...formData, paymentAmount: parseFloat(e.target.value)})} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de Corte</label>
+                    <input type="date" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                      value={formData.cutoffDate} onChange={e => setFormData({...formData, cutoffDate: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-700 mt-6 sticky bottom-0 bg-white dark:bg-slate-800">
+                <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancelar</button>
+                <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-lg shadow-blue-600/20 transition-colors">
+                  {editingId ? 'Actualizar Usuario' : 'Guardar Usuario'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

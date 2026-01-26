@@ -1,12 +1,17 @@
-// API Configuration
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+import axios from 'axios';
 
-// Default configuration
-export const CONFIG = {
-  API_URL,
-  DEFAULT_EXCHANGE_RATE: 50,
-  PAGINATION_LIMIT: 50,
-  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
-};
+export const API_URL = "http://localhost:3001/api";
 
-export default CONFIG;
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+api.interceptors.request.use((config) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user?.access_token) {
+    config.headers.Authorization = `Bearer ${user.access_token}`;
+  }
+  return config;
+});
+
+export default api;
