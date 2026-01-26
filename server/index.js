@@ -7,8 +7,8 @@ dotenv.config();
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-const PORT = 3001;
-const SECRET_KEY = 'bodega_secret_key'; // In production, use env var
+const PORT = process.env.PORT || 3001;
+const SECRET_KEY = process.env.JWT_SECRET || 'bodega_secret_key';
 let previewIsSelect = false;
 
 // Supabase client (optional)
@@ -19,7 +19,12 @@ const supabase = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
   : null;
 const hasSupabase = !!supabase;
 
-app.use(cors());
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || null;
+if (ALLOWED_ORIGIN) {
+  app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true }));
+} else {
+  app.use(cors());
+}
 app.use(bodyParser.json());
 
 // In-memory data store
