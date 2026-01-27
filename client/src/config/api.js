@@ -121,7 +121,6 @@ api.interceptors.request.use(async (config) => {
     console.log("[Mock Adapter] Intercepting request:", config.url);
 
     // Simulate network delay for realism (optional, but good for UX testing)
-    await new Promise((resolve) => setTimeout(resolve, 300));
 
     // Handle Login
     if (config.url === "/auth/login" && config.method === "post") {
