@@ -62,7 +62,7 @@ const Layout = () => {
           <Link to="/admin" className={linkClass('/admin')} onClick={() => setMobileMenuOpen(false)}>
             <Shield size={20} /> Dashboard
           </Link>
-          
+
           <Link to="/admin/backup" className={linkClass('/admin/backup')} onClick={() => setMobileMenuOpen(false)}>
             <Database size={20} /> Respaldo
           </Link>
@@ -73,21 +73,8 @@ const Layout = () => {
         </>
       ) : (
         <>
-          {/* User Menu Items... */}
           <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Menu</div>
-          <Link to="/inventory" className={linkClass('/inventory')} onClick={() => setMobileMenuOpen(false)}>
-            <Package size={20} /> Inventario
-          </Link>
-          <Link to="/sales" className={linkClass('/sales')} onClick={() => setMobileMenuOpen(false)}>
-            <ShoppingCart size={20} /> Ventas
-          </Link>
-          <Link to="/clients" className={linkClass('/clients')} onClick={() => setMobileMenuOpen(false)}>
-            <Users size={20} /> Clientes
-          </Link>
-          <Link to="/reports" className={linkClass('/reports')} onClick={() => setMobileMenuOpen(false)}>
-            <BarChart3 size={20} /> Reportes
-          </Link>
-          <Link to="/dashboard" className={linkClass('/dashboard')} onClick={() => setMobileMenuOpen(false)}>
+          <Link to="/user" className={linkClass('/user')} onClick={() => setMobileMenuOpen(false)}>
             <LayoutDashboard size={20} /> Inicio
           </Link>
         </>
@@ -147,7 +134,7 @@ const Layout = () => {
 
       {/* Mobile Menu Button - Only show when menu is CLOSED */}
       {!mobileMenuOpen && (
-        <button 
+        <button
           className="lg:hidden fixed top-3 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg hover:bg-slate-800 transition-colors"
           onClick={() => setMobileMenuOpen(true)}
         >
@@ -164,15 +151,15 @@ const Layout = () => {
       <div className={`fixed inset-y-0 left-0 w-64 bg-slate-900 z-50 p-6 flex flex-col transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
         {/* Mobile Sidebar Header with Close Button */}
         <div className="flex items-center justify-between mb-6 px-2">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg overflow-hidden">
-                  <BrandIcon size={32} />
-                </div>
-                <h1 className="text-xl font-bold text-white">Invexis</h1>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <BrandIcon size={32} />
             </div>
-            <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white transition-colors">
-                <X size={24} />
-            </button>
+            <h1 className="text-xl font-bold text-white">Invexis</h1>
+          </div>
+          <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+            <X size={24} />
+          </button>
         </div>
 
         <SidebarNav />

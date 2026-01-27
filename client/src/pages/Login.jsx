@@ -19,7 +19,11 @@ const Login = () => {
     setError('');
     const res = await login(username, password);
     if (res.success) {
-      navigate('/');
+      if (res.user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/user');
+      }
     } else {
       setError(res.message);
     }
@@ -30,7 +34,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 transition-colors duration-300 relative">
       {/* Theme Toggle Button */}
-      <button 
+      <button
         onClick={toggleTheme}
         className="absolute top-6 right-6 p-2 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-lg hover:scale-110 transition-all border dark:border-slate-700"
       >
@@ -90,8 +94,8 @@ const Login = () => {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 flex items-center justify-center gap-2 mt-2"
               >
                 Iniciar Sesión <ArrowRight size={20} />

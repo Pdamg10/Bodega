@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
       // Events to track activity
       const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
-      
+
       const handleActivity = () => {
         resetInactivityTimer();
       };
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       const userData = { ...res.data.user, access_token: res.data.access_token };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       if (ALLOW_DEMO) {
         const role = (username || '').toLowerCase() === 'admin' ? 'admin' : 'user';
