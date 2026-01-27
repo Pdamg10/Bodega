@@ -4,7 +4,8 @@ import api from '../config/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const ALLOW_DEMO = import.meta.env?.VITE_DEMO_LOGIN === 'true';
+  const isNetlify = typeof window !== 'undefined' && /netlify\.app$/.test(window.location.hostname);
+  const ALLOW_DEMO = (import.meta.env?.VITE_DEMO_LOGIN === 'true') || isNetlify;
   const DEMO_USER = import.meta.env?.VITE_DEMO_USER || 'admin';
   const DEMO_PASS = import.meta.env?.VITE_DEMO_PASS || 'admin123';
 
