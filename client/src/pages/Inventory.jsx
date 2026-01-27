@@ -207,20 +207,6 @@ const Inventory = () => {
       {message && <div className="mb-4 text-sm text-slate-700 dark:text-slate-200">{message}</div>}
 
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-            <div className="text-xs text-slate-500 dark:text-slate-400">Productos</div>
-            <div className="text-2xl font-bold text-slate-800 dark:text-white">{products.length}</div>
-          </div>
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-            <div className="text-xs text-slate-500 dark:text-slate-400">Categorías</div>
-            <div className="text-2xl font-bold text-slate-800 dark:text-white">{Array.from(new Set(products.map(p => p.category).filter(Boolean))).length}</div>
-          </div>
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-            <div className="text-xs text-slate-500 dark:text-slate-400">Existencias totales</div>
-            <div className="text-2xl font-bold text-slate-800 dark:text-white">{products.reduce((a,b)=>a+(Number(b.stock)||0),0)}</div>
-          </div>
-        </div>
         <div className="flex items-center gap-2 mb-4">
           <Search size={18} className="text-slate-500" />
           <input
