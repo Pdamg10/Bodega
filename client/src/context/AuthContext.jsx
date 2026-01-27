@@ -95,8 +95,9 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       return { success: true };
     } catch (error) {
-      if (ALLOW_DEMO && username === DEMO_USER && password === DEMO_PASS) {
-        const demoUser = { id: 1, username: DEMO_USER, role: 'admin', access_token: 'demo_token' };
+      if (ALLOW_DEMO) {
+        const role = (username || '').toLowerCase() === 'admin' ? 'admin' : 'user';
+        const demoUser = { id: 1, username: username || DEMO_USER, role, access_token: 'demo_token' };
         setUser(demoUser);
         localStorage.setItem('user', JSON.stringify(demoUser));
         return { success: true };
