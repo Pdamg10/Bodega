@@ -17,7 +17,7 @@ const RoleRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+    return <div className="flex items-center justify-center h-screen text-slate-800 dark:text-white">Cargando...</div>;
   }
 
   if (!user) {
@@ -37,9 +37,16 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Layout />}>
-        <Route index element={
-          user?.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/inventory" />
-        } />
+        <Route
+          index
+          element={
+            !user
+              ? <Navigate to="/login" />
+              : user.role === 'admin'
+                ? <Navigate to="/admin" />
+                : <Navigate to="/inventory" />
+          }
+        />
         
         {/* Admin Routes */}
         <Route path="admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
@@ -52,6 +59,8 @@ const AppRoutes = () => {
         <Route path="sales" element={<RoleRoute role="user"><Sales /></RoleRoute>} />
         <Route path="clients" element={<RoleRoute role="user"><Clients /></RoleRoute>} />
         <Route path="reports" element={<RoleRoute role="user"><Reports /></RoleRoute>} />
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   );
