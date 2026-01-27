@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
 const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -877,4 +878,13 @@ app.put('/api/auth/profile', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+const clientDist = path.resolve(__dirname, '../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ message: 'Not found' });
+  }
+  res.sendFile(path.join(clientDist, 'index.html'));
 });
