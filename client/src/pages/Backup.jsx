@@ -232,35 +232,7 @@ const Backup = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-            <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-              Almacenamiento de Respaldos
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Controla el espacio utilizado por tus respaldos.
-            </p>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300">
-                <span>Usado</span>
-                <span>{formatBytes(storage.usedBytes)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-slate-600 dark:text-slate-300">
-                <span>Capacidad</span>
-                <span>{formatBytes(storage.capacityBytes)}</span>
-              </div>
-              <div className="mt-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                <div
-                  className="h-2 bg-blue-500"
-                  style={{
-                    width:
-                      storage.capacityBytes && storage.usedBytes
-                        ? `${Math.min(100, (storage.usedBytes / storage.capacityBytes) * 100)}%`
-                        : '0%',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
 
@@ -280,15 +252,14 @@ const Backup = () => {
               <li key={index} className="px-6 py-3 flex items-start gap-3">
                 <div className="mt-1">
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
-                      log.type === 'CREATE'
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${log.type === 'CREATE'
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
                         : log.type === 'RESTORE'
-                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-                        : log.type === 'DELETE'
-                        ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
-                        : 'bg-slate-100 text-slate-700 dark:bg-slate-900/40 dark:text-slate-300'
-                    }`}
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                          : log.type === 'DELETE'
+                            ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-900/40 dark:text-slate-300'
+                      }`}
                   >
                     {log.type}
                   </span>
