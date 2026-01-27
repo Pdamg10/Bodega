@@ -47,6 +47,10 @@ const App = () => {
 
                                 {/* User Routes (if applicable) */}
                                 <Route path="/user" element={<UserDashboard />} />
+                                <Route path="/user/inventory" element={<Inventory />} />
+                                <Route path="/user/sales" element={<Sales />} />
+                                <Route path="/user/clients" element={<Clients />} />
+                                <Route path="/user/reports" element={<Reports />} />
                             </Route>
 
                             {/* Catch all */}

@@ -77,6 +77,18 @@ const Layout = () => {
           <Link to="/user" className={linkClass('/user')} onClick={() => setMobileMenuOpen(false)}>
             <LayoutDashboard size={20} /> Inicio
           </Link>
+          <Link to="/user/inventory" className={linkClass('/user/inventory')} onClick={() => setMobileMenuOpen(false)}>
+            <Package size={20} /> Inventario
+          </Link>
+          <Link to="/user/sales" className={linkClass('/user/sales')} onClick={() => setMobileMenuOpen(false)}>
+            <ShoppingCart size={20} /> Ventas
+          </Link>
+          <Link to="/user/clients" className={linkClass('/user/clients')} onClick={() => setMobileMenuOpen(false)}>
+            <Users size={20} /> Clientes
+          </Link>
+          <Link to="/user/reports" className={linkClass('/user/reports')} onClick={() => setMobileMenuOpen(false)}>
+            <BarChart3 size={20} /> Reportes
+          </Link>
         </>
       )}
     </nav>
