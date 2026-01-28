@@ -190,7 +190,7 @@ const AppearanceTab = ({ toggleTheme, showStatus }) => {
             {['#2563eb', '#16a34a', '#dc2626', '#9333ea', '#f59e0b'].map(c => (
               <button key={c}
                 onClick={() => changeColor(c)}
-                className={`w-10 h-10 rounded-full border-2 shadow-md transition-all ${color === c ? 'border-slate-800 dark:border-white scale-110' : 'border-white dark:border-slate-600'}`}
+                className={`w-10 h-10 rounded-full border-2 shadow-md transition-all ${themeColor === c ? 'border-slate-800 dark:border-white scale-110' : 'border-white dark:border-slate-600'}`}
                 style={{ backgroundColor: c }}
               ></button>
             ))}
