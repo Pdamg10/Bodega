@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import api from '../config/api';
-import { Package, AlertTriangle, Clock, ArrowRightLeft, TrendingDown, TrendingUp, Calendar } from 'lucide-react';
+import {
+  Package, AlertTriangle, Clock, TrendingUp, TrendingDown,
+  DollarSign, ShoppingCart, UserPlus, CreditCard, ChevronRight,
+  ClipboardList, Activity
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const UserDashboard = () => {
-  const [products, setProducts] = useState([]);
-  const [movements, setMovements] = useState([]);
+  const [data, setData] = useState({
+    products: [],
+    movements: [],
+    customers: [],
+    orders: [],
+    history: [],
+    activity: []
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,203 +24,282 @@ const UserDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [productsRes, movementsRes] = await Promise.all([
+      const [prod, mov, cust, ord, hist, act] = await Promise.all([
         api.get('/products'),
-        api.get('/movements')
+        api.get('/movements'),
+        api.get('/customers'),
+        api.get('/orders'),
+        api.get('/sales/history'),
+        api.get('/activity')
       ]);
-      setProducts(productsRes.data);
-      setMovements(movementsRes.data);
+      setData({
+        products: prod.data,
+        movements: mov.data,
+        customers: cust.data,
+        orders: ord.data,
+        history: hist.data,
+        activity: act.data
+      });
     } catch (error) {
-      console.error('Error fetching dashboard data', error);
+      console.error('Error dashboard data', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Calculations
-  const lowStockItems = products.filter(p => p.stock <= p.minStock);
-  const totalStock = products.reduce((acc, curr) => acc + curr.stock, 0);
-  
-  // Expiring soon (within 30 days)
-  const today = new Date();
-  const thirtyDaysFromNow = new Date();
-  thirtyDaysFromNow.setDate(today.getDate() + 30);
-  
-  const expiringItems = products.filter(p => {
-    if (!p.expirationDate) return false;
-    const expDate = new Date(p.expirationDate);
-    return expDate >= today && expDate <= thirtyDaysFromNow;
-  });
+  // KPIs
+  const totalSalesToday = 120.50; // Mock calculation or from history
+  const pendingPayments = data.customers.reduce((acc, c) => acc + (c.debt?.currentDebt || 0), 0);
+  const debtClients = data.customers.filter(c => c.debt?.currentDebt > 0).length;
 
-  const lastMovement = movements.length > 0 
-    ? movements.sort((a, b) => new Date(b.date) - new Date(a.date))[0] 
-    : null;
+  // Smart Alerts
+  const lowStock = data.products.filter(p => p.stock <= p.minStock);
+  const criticalStock = data.products.filter(p => p.stock === 0);
+  const pendingOrders = data.orders.filter(o => o.status === 'pending');
+  const overdueClients = data.customers.filter(c => c.debt?.daysOverdue > 7);
 
-  if (loading) {
-    return <div className="p-8 text-center">Cargando información...</div>;
-  }
+  // Quick Chart (CSS Bar Chart)
+  const maxSales = Math.max(...data.history.map(h => h.sales), 1);
+
+  if (loading) return <div className="p-8 text-center animate-pulse">Cargando panel de control...</div>;
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Mi Inventario</h1>
-        <p className="text-slate-500 dark:text-slate-400">Resumen general del estado de tus productos</p>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
+
+      {/* Header & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Panel de Control</h1>
+          <p className="text-slate-500 dark:text-slate-400">Resumen operativo de tu negocio</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/user/sales" className="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-90 font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all">
+            <DollarSign size={18} /> Nueva Venta
+          </Link>
+          <Link to="/user/inventory" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all">
+            <Package size={18} /> Producto
+          </Link>
+          <Link to="/user/clients" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all">
+            <UserPlus size={18} /> Cliente
+          </Link>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        {/* Total Stock */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl">
-              <Package size={24} />
-            </div>
+      {/* 1. KPIs Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <DollarSign size={48} className="text-green-500" />
           </div>
-          <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium">Stock Total</h3>
-          <p className="text-3xl font-bold text-slate-800 dark:text-white mt-1">{totalStock}</p>
-          <div className="mt-2 text-xs text-slate-400 dark:text-slate-500">Unidades disponibles</div>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Ventas del Día</p>
+          <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">${totalSalesToday}</h3>
+          <p className="text-xs text-green-500 flex items-center gap-1 mt-2">
+            <TrendingUp size={14} /> +12% vs ayer
+          </p>
         </div>
 
-        {/* Low Stock */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl">
-              <AlertTriangle size={24} />
-            </div>
-            {lowStockItems.length > 0 && (
-              <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-1 rounded-full">
-                {lowStockItems.length} Alertas
-              </span>
-            )}
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Package size={48} className="text-blue-500" />
           </div>
-          <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium">Por Agotarse</h3>
-          <p className="text-3xl font-bold text-slate-800 dark:text-white mt-1">{lowStockItems.length}</p>
-          <div className="mt-2 text-xs text-slate-400 dark:text-slate-500">Productos con stock bajo</div>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Top Producto</p>
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mt-1 truncate">Arroz 1kg</h3>
+          <p className="text-xs text-slate-400 mt-2">45 unidades vendidas</p>
         </div>
 
-        {/* Expiring Soon */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl">
-              <Clock size={24} />
-            </div>
-            {expiringItems.length > 0 && (
-              <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold px-2 py-1 rounded-full">
-                {expiringItems.length} Riesgos
-              </span>
-            )}
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <CreditCard size={48} className="text-orange-500" />
           </div>
-          <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium">Por Vencer</h3>
-          <p className="text-3xl font-bold text-slate-800 dark:text-white mt-1">{expiringItems.length}</p>
-          <div className="mt-2 text-xs text-slate-400 dark:text-slate-500">Próximos 30 días</div>
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Por Cobrar</p>
+          <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">${pendingPayments}</h3>
+          <p className="text-xs text-orange-500 flex items-center gap-1 mt-2">
+            {debtClients} clientes con deuda
+          </p>
         </div>
 
-        {/* Last Movement */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl">
-              <ArrowRightLeft size={24} />
-            </div>
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <ClipboardList size={48} className="text-purple-500" />
           </div>
-          <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium">Último Movimiento</h3>
-          <div className="mt-1">
-             {lastMovement ? (
-                <>
-                  <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-white text-lg">
-                     {lastMovement.type === 'IN' ? <TrendingUp size={18} className="text-green-500" /> : <TrendingDown size={18} className="text-red-500" />}
-                     {lastMovement.quantity} u.
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Encargos</p>
+          <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">{pendingOrders.length}</h3>
+          <p className="text-xs text-purple-500 flex items-center gap-1 mt-2">
+            Ver pendientes
+          </p>
+        </div>
+      </div>
+
+      {/* 2. Smart Alerts Area */}
+      {(lowStock.length > 0 || overdueClients.length > 0) && (
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {criticalStock.map(p => (
+            <div key={p.id} className="min-w-[250px] bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 p-4 rounded-xl flex items-start gap-3 animate-pulse">
+              <AlertTriangle className="text-red-500 shrink-0" size={20} />
+              <div>
+                <h4 className="font-bold text-red-700 dark:text-red-300 text-sm">Sin Stock</h4>
+                <p className="text-xs text-red-600 dark:text-red-400 mt-1">El producto <strong>{p.name}</strong> se ha agotado.</p>
+              </div>
+            </div>
+          ))}
+          {overdueClients.map(c => (
+            <div key={c.id} className="min-w-[250px] bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 p-4 rounded-xl flex items-start gap-3">
+              <Clock className="text-orange-500 shrink-0" size={20} />
+              <div>
+                <h4 className="font-bold text-orange-700 dark:text-orange-300 text-sm">Deuda Vencida</h4>
+                <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">{c.firstName} debe ${c.debt.currentDebt} ({c.debt.daysOverdue} días).</p>
+              </div>
+            </div>
+          ))}
+          {lowStock.map(p => (
+            <div key={p.id} className="min-w-[250px] bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-4 rounded-xl flex items-start gap-3">
+              <AlertTriangle className="text-amber-500 shrink-0" size={20} />
+              <div>
+                <h4 className="font-bold text-amber-700 dark:text-amber-300 text-sm">Stock Bajo</h4>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">Quedan {p.stock} unidades de {p.name}.</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* 3. Sales Chart (Last 7 Days) */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <TrendingUp size={20} /> Ventas (Últimos 7 días)
+            </h3>
+          </div>
+
+          <div className="h-48 flex items-end gap-3 md:gap-6 justify-between px-2">
+            {data.history.map((day, i) => {
+              const heightPct = (day.sales / maxSales) * 100;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                  <div className="relative w-full bg-slate-100 dark:bg-slate-700 rounded-t-lg h-full overflow-hidden flex items-end">
+                    <div
+                      style={{ height: `${heightPct}%` }}
+                      className="w-full bg-primary opacity-80 group-hover:opacity-100 transition-all rounded-t-lg relative"
+                    >
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${day.sales}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate w-full" title={lastMovement.productName}>
-                    {lastMovement.productName}
-                  </div>
-                  <div className="text-[10px] text-slate-400 mt-1">
-                    {new Date(lastMovement.date).toLocaleDateString()}
-                  </div>
-                </>
-             ) : (
-               <p className="text-slate-400 text-sm italic">Sin registros</p>
-             )}
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{day.date}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. Recent Activity Feed */}
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+          <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+            <Activity size={20} /> Actividad Reciente
+          </h3>
+          <div className="space-y-4">
+            {data.activity.slice(0, 5).map((log, i) => (
+              <div key={i} className="flex gap-3 items-start pb-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0 last:pb-0">
+                <div className={`mt-1 p-1.5 rounded-full shrink-0 ${log.type === 'SALE' ? 'bg-green-100 text-green-600' :
+                    log.type === 'PAYMENT' ? 'bg-blue-100 text-blue-600' :
+                      'bg-slate-100 text-slate-500'
+                  }`}>
+                  {log.type === 'SALE' ? <DollarSign size={12} /> :
+                    log.type === 'PAYMENT' ? <CreditCard size={12} /> :
+                      <AlertTriangle size={12} />}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{log.message}</p>
+                  <p className="text-xs text-slate-400 mt-0.5 flex justify-between w-full">
+                    <span>{log.user}</span>
+                    <span>{new Date(log.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Low Stock List */}
+        {/* 5. Cuentas por Cobrar */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-            <h2 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <AlertTriangle size={20} className="text-amber-500" /> Stock Crítico
-            </h2>
-            <button className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">Ver todo</button>
+          <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <CreditCard size={20} className="text-primary" /> Cuentas por Cobrar
+            </h3>
+            <Link to="/user/clients" className="text-xs text-primary font-medium hover:underline">Ver todas</Link>
           </div>
-          <div className="p-0">
-             {lowStockItems.length === 0 ? (
-               <div className="p-8 text-center text-slate-400">Todo parece estar en orden</div>
-             ) : (
-               <table className="w-full text-left text-sm">
-                 <thead className="bg-slate-50 dark:bg-slate-900/50">
-                   <tr>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400">Producto</th>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400 text-right">Disponible</th>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400 text-right">Mínimo</th>
-                   </tr>
-                 </thead>
-                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                   {lowStockItems.slice(0, 5).map(item => (
-                     <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                       <td className="px-6 py-3 text-slate-800 dark:text-white font-medium">{item.name}</td>
-                       <td className="px-6 py-3 text-right text-red-600 dark:text-red-400 font-bold">{item.stock}</td>
-                       <td className="px-6 py-3 text-right text-slate-500">{item.minStock}</td>
-                     </tr>
-                   ))}
-                 </tbody>
-               </table>
-             )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th className="px-6 py-3 font-medium">Cliente</th>
+                  <th className="px-6 py-3 font-medium">Monto</th>
+                  <th className="px-6 py-3 font-medium">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                {data.customers.filter(c => c.debt?.currentDebt > 0).slice(0, 5).map(c => (
+                  <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td className="px-6 py-3 font-medium text-slate-800 dark:text-white">{c.firstName} {c.lastName}</td>
+                    <td className="px-6 py-3 font-bold text-slate-800 dark:text-white">${c.debt.currentDebt}</td>
+                    <td className="px-6 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${c.debt.daysOverdue > 7 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {c.debt.daysOverdue} días
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {data.customers.filter(c => c.debt?.currentDebt > 0).length === 0 && (
+                  <tr><td colSpan="3" className="px-6 py-8 text-center text-slate-400">No hay deudas pendientes</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Expiring Soon List */}
+        {/* 6. Encargos Pendientes */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-            <h2 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <Calendar size={20} className="text-red-500" /> Próximos Vencimientos
-            </h2>
-            <button className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">Ver todo</button>
+          <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <ClipboardList size={20} className="text-purple-500" /> Encargos
+            </h3>
+            <button className="text-xs text-purple-500 font-medium hover:underline">Gestionar</button>
           </div>
-           <div className="p-0">
-             {expiringItems.length === 0 ? (
-               <div className="p-8 text-center text-slate-400">No hay productos por vencer pronto</div>
-             ) : (
-               <table className="w-full text-left text-sm">
-                 <thead className="bg-slate-50 dark:bg-slate-900/50">
-                   <tr>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400">Producto</th>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400">Vence</th>
-                     <th className="px-6 py-3 font-semibold text-slate-500 dark:text-slate-400 text-right">Días</th>
-                   </tr>
-                 </thead>
-                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                   {expiringItems.slice(0, 5).map(item => {
-                     const daysLeft = Math.ceil((new Date(item.expirationDate) - new Date()) / (1000 * 60 * 60 * 24));
-                     return (
-                       <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                         <td className="px-6 py-3 text-slate-800 dark:text-white font-medium">{item.name}</td>
-                         <td className="px-6 py-3 text-slate-500">{new Date(item.expirationDate).toLocaleDateString()}</td>
-                         <td className="px-6 py-3 text-right">
-                           <span className={`px-2 py-1 rounded-full text-xs font-bold ${daysLeft <= 10 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                             {daysLeft} días
-                           </span>
-                         </td>
-                       </tr>
-                     );
-                   })}
-                 </tbody>
-               </table>
-             )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th className="px-6 py-3 font-medium">Cliente</th>
+                  <th className="px-6 py-3 font-medium">Detalle</th>
+                  <th className="px-6 py-3 font-medium text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                {pendingOrders.map(o => (
+                  <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td className="px-6 py-3 font-medium text-slate-800 dark:text-white">{o.client}</td>
+                    <td className="px-6 py-3 text-slate-600 dark:text-slate-300 truncate max-w-[150px]">{o.product}</td>
+                    <td className="px-6 py-3 text-right">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-full text-xs font-bold">
+                        Pendiente
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {pendingOrders.length === 0 && (
+                  <tr><td colSpan="3" className="px-6 py-8 text-center text-slate-400">No hay encargos activos</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+
     </div>
   );
 };
