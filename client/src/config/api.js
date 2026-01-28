@@ -106,28 +106,6 @@ if (typeof window !== "undefined" && !window.__MOCK_DATA__) {
     customers: [
       {
         id: 1,
-        firstName: "Cliente",
-        lastName: "Demo",
-        cedula: "12345678",
-        phone: "555-1111",
-        debt: {
-          enabled: false,
-          parts: 0,
-          installmentAmount: 0,
-          frequency: null,
-        },
-        specialOrder: {
-          enabled: false,
-          product: "",
-          payInAdvance: false,
-          advanceAmount: 0,
-          notes: "",
-        },
-        createdAt: new Date().toISOString(),
-      },
-    customers: [
-      {
-        id: 1,
         firstName: "Juan",
         lastName: "Pérez",
         cedula: "12345678",
@@ -160,7 +138,7 @@ if (typeof window !== "undefined" && !window.__MOCK_DATA__) {
         phone: "555-3333",
         debt: { enabled: false, currentDebt: 0, daysOverdue: 0 },
         createdAt: new Date(Date.now() - 86400000 * 60).toISOString(),
-      }
+      },
     ],
     backups: [],
     logs: [
@@ -174,38 +152,67 @@ if (typeof window !== "undefined" && !window.__MOCK_DATA__) {
         message: "Inicio de sesión exitoso (Admin)",
         ts: new Date().toISOString(),
       },
-    logs: [
+      // New Activity Feed Mock
       {
-        type: "CREATE",
-        message: "Respaldo automático creado",
-        ts: new Date(Date.now() - 86400000).toISOString(),
-      },
-      {
-        type: "LOGIN",
-        message: "Inicio de sesión exitoso (Admin)",
+        type: "SALE",
+        message: "Venta registrada #1024",
+        amount: 45.0,
+        user: "Juan",
         ts: new Date().toISOString(),
       },
-      // New Activity Feed Mock
-      { type: "SALE", message: "Venta registrada #1024", amount: 45.00, user: "Juan", ts: new Date().toISOString() },
-      { type: "ADD_PRODUCT", message: "Producto agregado: Harina PAN", user: "Admin", ts: new Date(Date.now() - 3600000).toISOString() },
-      { type: "PAYMENT", message: "Pago recibido: Ana López", amount: 120.00, user: "Admin", ts: new Date(Date.now() - 7200000).toISOString() },
-      { type: "STOCK_LOW", message: "Stock bajo: Leche 1L", user: "System", ts: new Date(Date.now() - 86400000).toISOString() },
+      {
+        type: "ADD_PRODUCT",
+        message: "Producto agregado: Harina PAN",
+        user: "Admin",
+        ts: new Date(Date.now() - 3600000).toISOString(),
+      },
+      {
+        type: "PAYMENT",
+        message: "Pago recibido: Ana López",
+        amount: 120.0,
+        user: "Admin",
+        ts: new Date(Date.now() - 7200000).toISOString(),
+      },
+      {
+        type: "STOCK_LOW",
+        message: "Stock bajo: Leche 1L",
+        user: "System",
+        ts: new Date(Date.now() - 86400000).toISOString(),
+      },
     ],
     // New Orders (Encargos)
     orders: [
-      { id: 1, client: "Carlos Pérez", product: "Caja de Aceite x12", status: "pending", date: new Date().toISOString() },
-      { id: 2, client: "María Rodriguez", product: "5 Sacos de Arroz", status: "ready", date: new Date(Date.now() - 86400000).toISOString() },
-      { id: 3, client: "Pedro D.", product: "Queso Especial", status: "delivered", date: new Date(Date.now() - 172800000).toISOString() },
+      {
+        id: 1,
+        client: "Carlos Pérez",
+        product: "Caja de Aceite x12",
+        status: "pending",
+        date: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        client: "María Rodriguez",
+        product: "5 Sacos de Arroz",
+        status: "ready",
+        date: new Date(Date.now() - 86400000).toISOString(),
+      },
+      {
+        id: 3,
+        client: "Pedro D.",
+        product: "Queso Especial",
+        status: "delivered",
+        date: new Date(Date.now() - 172800000).toISOString(),
+      },
     ],
     // Sales History for Chart (Last 7 days)
     salesHistory: Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return {
-            date: d.toLocaleDateString('es-ES', { weekday: 'short' }),
-            sales: Math.floor(Math.random() * 500) + 100,
-            payments: Math.floor(Math.random() * 400) + 50
-        };
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        date: d.toLocaleDateString("es-ES", { weekday: "short" }),
+        sales: Math.floor(Math.random() * 500) + 100,
+        payments: Math.floor(Math.random() * 400) + 50,
+      };
     }),
     plans: [
       {
