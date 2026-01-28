@@ -63,7 +63,7 @@ const Layout = () => {
             <Shield size={20} /> Dashboard
           </Link>
 
-          <Link to="/admin/backup" className={linkClass('/admin/backup')} onClick={() => setMobileMenuOpen(false)}>
+          <Link to="/admin/settings?tab=backups" className={linkClass('/admin/settings')} onClick={() => setMobileMenuOpen(false)}>
             <Database size={20} /> Respaldo
           </Link>
 

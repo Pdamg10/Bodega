@@ -127,7 +127,86 @@ if (typeof window !== "undefined" && !window.__MOCK_DATA__) {
       },
     ],
     backups: [],
-    logs: [],
+    logs: [
+      {
+        type: "CREATE",
+        message: "Respaldo automático creado",
+        ts: new Date(Date.now() - 86400000).toISOString(),
+      },
+      {
+        type: "LOGIN",
+        message: "Inicio de sesión exitoso (Admin)",
+        ts: new Date().toISOString(),
+      },
+    ],
+    // New mock collections for extended settings
+    sessions: [
+      {
+        id: 1,
+        device: "Chrome / Windows",
+        ip: "192.168.1.1",
+        location: "Caracas, VE",
+        lastActive: new Date().toISOString(),
+        current: true,
+      },
+      {
+        id: 2,
+        device: "Safari / iPhone",
+        ip: "201.21.10.5",
+        location: "Maracaibo, VE",
+        lastActive: new Date(Date.now() - 3600000 * 2).toISOString(),
+        current: false,
+      },
+    ],
+    notifications: {
+      admin: { userExpiring: true, userSuspended: true },
+      user: { closeCutoff: true, suspended: true },
+      channels: { system: true, email: false },
+    },
+    supportMessages: [
+      {
+        id: 1,
+        user: "vendedor",
+        subject: "Problema con impresora",
+        text: "No puedo imprimir el ticket de venta #1024",
+        date: new Date(Date.now() - 7200000).toISOString(),
+        read: false,
+      },
+      {
+        id: 2,
+        user: "vendedor",
+        subject: "Duda sobre cierre",
+        text: "¿A qué hora se debe hacer el cierre hoy?",
+        date: new Date(Date.now() - 86400000 * 2).toISOString(),
+        read: true,
+      },
+    ],
+    auditLogs: [
+      {
+        id: 1,
+        action: "CREATE_USER",
+        detail: 'Creó usuario "vendedor2"',
+        admin: "admin",
+        date: new Date(Date.now() - 86400000 * 5).toISOString(),
+      },
+      {
+        id: 2,
+        action: "UPDATE_SETTINGS",
+        detail: "Cambió moneda a USD",
+        admin: "admin",
+        date: new Date(Date.now() - 86400000 * 10).toISOString(),
+      },
+    ],
+    systemConfig: {
+      currency: "USD",
+      symbol: "$",
+      taxCookies: true,
+      taxRate: 16,
+      themeColor: "#2563eb",
+      dateFormat: "DD/MM/YYYY",
+      timezone: "America/Caracas",
+      limits: { maxProducts: 500, maxClients: 100 }, // per user default
+    },
   };
 }
 
@@ -193,6 +272,14 @@ api.interceptors.request.use(async (config) => {
       else if (config.url === "/movements") data = mockDB.movements;
       else if (config.url === "/backups") data = mockDB.backups;
       else if (config.url === "/backups/logs") data = mockDB.logs;
+      // New GET endpoints
+      else if (config.url === "/settings/sessions") data = mockDB.sessions;
+      else if (config.url === "/settings/audit") data = mockDB.auditLogs;
+      else if (config.url === "/settings/notifications")
+        data = mockDB.notifications;
+      else if (config.url === "/settings/system") data = mockDB.systemConfig;
+      else if (config.url === "/support/messages")
+        data = mockDB.supportMessages;
 
       if (data) {
         config.adapter = () =>
@@ -355,6 +442,38 @@ api.interceptors.request.use(async (config) => {
           request: {},
         });
       return config;
+    }
+
+    // Handle PATCH (Partial Update)
+    if (config.method === "patch") {
+      if (config.url === "/settings/notifications") {
+        const payload = JSON.parse(config.data || "{}");
+        mockDB.notifications = { ...mockDB.notifications, ...payload };
+        config.adapter = () =>
+          Promise.resolve({
+            data: mockDB.notifications,
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+            request: {},
+          });
+        return config;
+      }
+      if (config.url === "/settings/system") {
+        const payload = JSON.parse(config.data || "{}");
+        mockDB.systemConfig = { ...mockDB.systemConfig, ...payload };
+        config.adapter = () =>
+          Promise.resolve({
+            data: mockDB.systemConfig,
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+            request: {},
+          });
+        return config;
+      }
     }
   }
 

@@ -12,7 +12,6 @@ const Inventory = lazy(() => import('./pages/Inventory'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Sales = lazy(() => import('./pages/Sales'));
 const Settings = lazy(() => import('./pages/Settings'));
-const Backup = lazy(() => import('./pages/Backup'));
 const UserDashboard = lazy(() => import('./pages/UserDashboard'));
 
 // Loading component
@@ -43,7 +42,6 @@ const App = () => {
                                 <Route path="/admin/clients" element={<Clients />} />
                                 <Route path="/admin/reports" element={<Reports />} />
                                 <Route path="/admin/settings" element={<Settings />} />
-                                <Route path="/admin/backup" element={<Backup />} />
 
                                 {/* User Routes (if applicable) */}
                                 <Route path="/user" element={<UserDashboard />} />
