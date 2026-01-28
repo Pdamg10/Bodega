@@ -67,7 +67,8 @@ const UserDashboard = () => {
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
 
       {/* Header & Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      {/* Header & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 -mx-4 md:-mx-8 rounded-b-3xl mb-8 shadow-sm border-b border-white/50 dark:border-slate-700">
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Panel de Control</h1>
           <p className="text-slate-500 dark:text-slate-400">Resumen operativo de tu negocio</p>
@@ -76,10 +77,10 @@ const UserDashboard = () => {
           <Link to="/user/sales" className="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-90 font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all">
             <DollarSign size={18} /> Nueva Venta
           </Link>
-          <Link to="/user/inventory" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all">
+          <Link to="/user/inventory" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all shadow-sm">
             <Package size={18} /> Producto
           </Link>
-          <Link to="/user/clients" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all">
+          <Link to="/user/clients" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all shadow-sm">
             <UserPlus size={18} /> Cliente
           </Link>
         </div>
@@ -87,7 +88,7 @@ const UserDashboard = () => {
 
       {/* 1. KPIs Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
           <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <DollarSign size={48} className="text-green-500" />
           </div>
@@ -98,7 +99,7 @@ const UserDashboard = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
           <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Package size={48} className="text-blue-500" />
           </div>
@@ -107,7 +108,7 @@ const UserDashboard = () => {
           <p className="text-xs text-slate-400 mt-2">45 unidades vendidas</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
           <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <CreditCard size={48} className="text-orange-500" />
           </div>
@@ -118,7 +119,7 @@ const UserDashboard = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
           <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <ClipboardList size={48} className="text-purple-500" />
           </div>
@@ -166,7 +167,7 @@ const UserDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* 3. Sales Chart (Last 7 Days) */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <TrendingUp size={20} /> Ventas (Últimos 7 días)
@@ -196,7 +197,7 @@ const UserDashboard = () => {
         </div>
 
         {/* 4. Recent Activity Feed */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
           <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <Activity size={20} /> Actividad Reciente
           </h3>
@@ -204,8 +205,8 @@ const UserDashboard = () => {
             {data.activity.slice(0, 5).map((log, i) => (
               <div key={i} className="flex gap-3 items-start pb-3 border-b border-slate-50 dark:border-slate-700/50 last:border-0 last:pb-0">
                 <div className={`mt-1 p-1.5 rounded-full shrink-0 ${log.type === 'SALE' ? 'bg-green-100 text-green-600' :
-                    log.type === 'PAYMENT' ? 'bg-blue-100 text-blue-600' :
-                      'bg-slate-100 text-slate-500'
+                  log.type === 'PAYMENT' ? 'bg-blue-100 text-blue-600' :
+                    'bg-slate-100 text-slate-500'
                   }`}>
                   {log.type === 'SALE' ? <DollarSign size={12} /> :
                     log.type === 'PAYMENT' ? <CreditCard size={12} /> :
@@ -226,7 +227,7 @@ const UserDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* 5. Cuentas por Cobrar */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <CreditCard size={20} className="text-primary" /> Cuentas por Cobrar
@@ -263,7 +264,7 @@ const UserDashboard = () => {
         </div>
 
         {/* 6. Encargos Pendientes */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <ClipboardList size={20} className="text-purple-500" /> Encargos

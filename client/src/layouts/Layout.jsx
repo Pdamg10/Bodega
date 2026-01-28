@@ -198,7 +198,7 @@ const Layout = () => {
       </div>
 
 
-      <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
         <Outlet />
         {warningActive && (
           <div className="fixed bottom-4 right-4 z-50 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-xl shadow">

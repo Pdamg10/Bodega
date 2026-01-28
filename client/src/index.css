@@ -4,12 +4,14 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-white transition-colors duration-300;
+    @apply bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-white transition-colors duration-300;
     --primary-color: #2563eb;
   }
-  
+
   /* Apply smooth transition to all color-related properties for common elements */
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     @apply transition-colors duration-300 ease-in-out;
   }
 }
