@@ -12,6 +12,12 @@ const Inventory = lazy(() => import('./pages/Inventory'));
 const Reports = lazy(() => import('./pages/Reports'));
 const Sales = lazy(() => import('./pages/Sales'));
 const Settings = lazy(() => import('./pages/Settings'));
+const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
+const AdminSecurity = lazy(() => import('./pages/admin/AdminSecurity'));
+const AdminBilling = lazy(() => import('./pages/admin/AdminBilling'));
+const AdminBackups = lazy(() => import('./pages/admin/AdminBackups'));
+const AdminAudit = lazy(() => import('./pages/admin/AdminAudit'));
+const AdminSupport = lazy(() => import('./pages/admin/AdminSupport'));
 const UserDashboard = lazy(() => import('./pages/UserDashboard'));
 
 // Loading component
@@ -41,7 +47,15 @@ const App = () => {
                                 <Route path="/admin/sales" element={<Sales />} />
                                 <Route path="/admin/clients" element={<Clients />} />
                                 <Route path="/admin/reports" element={<Reports />} />
+                                <Route path="/admin/reports" element={<Reports />} />
                                 <Route path="/admin/settings" element={<Settings />} />
+
+                                <Route path="/admin/profile" element={<AdminProfile />} />
+                                <Route path="/admin/security" element={<AdminSecurity />} />
+                                <Route path="/admin/billing" element={<AdminBilling />} />
+                                <Route path="/admin/backups" element={<AdminBackups />} />
+                                <Route path="/admin/audit" element={<AdminAudit />} />
+                                <Route path="/admin/support" element={<AdminSupport />} />
 
                                 {/* User Routes (if applicable) */}
                                 <Route path="/user" element={<UserDashboard />} />

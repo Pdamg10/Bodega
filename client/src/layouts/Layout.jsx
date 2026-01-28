@@ -17,7 +17,7 @@ const Layout = () => {
   if (!user) return <Navigate to="/login" />;
 
   const isActive = (path) => location.pathname === path;
-  const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
+  const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
 
   const handleDownloadBackup = async () => {
     try {
@@ -58,15 +58,34 @@ const Layout = () => {
     <nav className="flex-1 space-y-2">
       {user.role === 'admin' ? (
         <>
-          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Admin</div>
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mt-2 mb-1">General</div>
           <Link to="/admin" className={linkClass('/admin')} onClick={() => setMobileMenuOpen(false)}>
-            <Shield size={20} /> Dashboard
+            <LayoutDashboard size={20} /> Dashboard
           </Link>
 
-          <Link to="/admin/settings?tab=backups" className={linkClass('/admin/settings')} onClick={() => setMobileMenuOpen(false)}>
-            <Database size={20} /> Respaldo
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mt-4 mb-1">Mi Cuenta</div>
+          <Link to="/admin/profile" className={linkClass('/admin/profile')} onClick={() => setMobileMenuOpen(false)}>
+            <UserCog size={20} /> Perfil
+          </Link>
+          <Link to="/admin/security" className={linkClass('/admin/security')} onClick={() => setMobileMenuOpen(false)}>
+            <Shield size={20} /> Seguridad
+          </Link>
+          <Link to="/admin/billing" className={linkClass('/admin/billing')} onClick={() => setMobileMenuOpen(false)}>
+            <ShoppingCart size={20} /> Pagos
           </Link>
 
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mt-4 mb-1">Gestión</div>
+          <Link to="/admin/support" className={linkClass('/admin/support')} onClick={() => setMobileMenuOpen(false)}>
+            <Users size={20} /> Soporte
+          </Link>
+          <Link to="/admin/audit" className={linkClass('/admin/audit')} onClick={() => setMobileMenuOpen(false)}>
+            <BarChart3 size={20} /> Auditoría
+          </Link>
+          <Link to="/admin/backups" className={linkClass('/admin/backups')} onClick={() => setMobileMenuOpen(false)}>
+            <Database size={20} /> Respaldos
+          </Link>
+
+          <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider mt-4 mb-1">Sistema</div>
           <Link to="/admin/settings" className={linkClass('/admin/settings')} onClick={() => setMobileMenuOpen(false)}>
             <Settings size={20} /> Configuración
           </Link>
@@ -130,7 +149,7 @@ const Layout = () => {
   );
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <div className="flex bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen">
       {/* Mobile Header Bar */}
       <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4 justify-between">
         <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Invexis</span>
@@ -155,7 +174,7 @@ const Layout = () => {
       )}
 
       {/* Sidebar for Desktop */}
-      <aside className="hidden lg:flex w-64 bg-slate-900 flex-col p-6 h-full">
+      <aside className="hidden lg:flex w-64 bg-slate-900 flex-col p-6 min-h-screen flex-shrink-0">
         <SidebarContent />
       </aside>
 
@@ -179,7 +198,7 @@ const Layout = () => {
       </div>
 
 
-      <main className="flex-1 overflow-auto w-full pt-20 lg:pt-0">
+      <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         <Outlet />
         {warningActive && (
           <div className="fixed bottom-4 right-4 z-50 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-xl shadow">

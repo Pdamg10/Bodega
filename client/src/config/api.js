@@ -139,6 +139,42 @@ if (typeof window !== "undefined" && !window.__MOCK_DATA__) {
         ts: new Date().toISOString(),
       },
     ],
+    plans: [
+      {
+        id: 1,
+        name: "🥉 Básico",
+        price: 9.99,
+        currency: "USD",
+        features: ["Hasta 50 Productos", "1 Usuario", "Soporte Básico"],
+        status: "active",
+      },
+      {
+        id: 2,
+        name: "🥈 Profesional",
+        price: 29.99,
+        currency: "USD",
+        features: [
+          "Hasta 500 Productos",
+          "5 Usuarios",
+          "Facturación",
+          "Soporte Prioritario",
+        ],
+        status: "active",
+      },
+      {
+        id: 3,
+        name: "🥇 Premium",
+        price: 99.99,
+        currency: "USD",
+        features: [
+          "Productos Ilimitados",
+          "Usuarios Ilimitados",
+          "API Access",
+          "Soporte 24/7",
+        ],
+        status: "active",
+      },
+    ],
     // New mock collections for extended settings
     sessions: [
       {
@@ -222,7 +258,9 @@ api.interceptors.request.use(async (config) => {
   // Detect Netlify environment
   const isNetlify =
     typeof window !== "undefined" &&
-    /netlify\.app$/.test(window.location.hostname);
+    (/netlify\.app$/.test(window.location.hostname) ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1");
 
   // If on Netlify, hijack the request and return mock data
   if (isNetlify) {
@@ -476,6 +514,39 @@ api.interceptors.request.use(async (config) => {
       }
     }
   }
+
+  mock.onGet("/plans").reply(() => {
+    return [200, window.__MOCK_DATA__.plans];
+  });
+
+  mock.onPost("/plans").reply((config) => {
+    const newPlan = JSON.parse(config.data);
+    newPlan.id = Date.now();
+    window.__MOCK_DATA__.plans.push(newPlan);
+    return [200, newPlan];
+  });
+
+  mock.onPut(new RegExp("/plans/\\d+")).reply((config) => {
+    const id = parseInt(config.url.split("/").pop());
+    const data = JSON.parse(config.data);
+    const index = window.__MOCK_DATA__.plans.findIndex((p) => p.id === id);
+    if (index !== -1) {
+      window.__MOCK_DATA__.plans[index] = {
+        ...window.__MOCK_DATA__.plans[index],
+        ...data,
+      };
+      return [200, window.__MOCK_DATA__.plans[index]];
+    }
+    return [404, { message: "Plan not found" }];
+  });
+
+  mock.onDelete(new RegExp("/plans/\\d+")).reply((config) => {
+    const id = parseInt(config.url.split("/").pop());
+    window.__MOCK_DATA__.plans = window.__MOCK_DATA__.plans.filter(
+      (p) => p.id !== id,
+    );
+    return [200, { message: "Plan deleted" }];
+  });
 
   return config;
 });

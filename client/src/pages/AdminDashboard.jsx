@@ -6,7 +6,7 @@ import { Users, UserPlus, Search, Edit, Trash2, Save, X, AlertTriangle, Bell } f
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  // Removed showModal state
   const { darkMode, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState([]);
   const [formData, setFormData] = useState({
@@ -49,7 +49,7 @@ const AdminDashboard = () => {
         const cutoff = new Date(user.cutoffDate);
         const diffTime = cutoff - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays >= 0 && diffDays <= 5) {
           alerts.push({
             id: user.id,
@@ -69,7 +69,8 @@ const AdminDashboard = () => {
       } else {
         await api.post('/users', formData);
       }
-      setShowModal(false);
+
+      // Removed setShowModal(false)
       fetchUsers();
       resetForm();
     } catch (error) {
@@ -83,7 +84,9 @@ const AdminDashboard = () => {
       password: '' // Don't show password, require new one only if changing
     });
     setEditingId(user.id);
-    setShowModal(true);
+    // Removed setShowModal(true)
+    // Scroll to top to show form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -117,7 +120,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto transition-colors duration-300">
-      
+
       {/* Notifications Area */}
       {notifications.length > 0 && (
         <div className="mb-6 space-y-2">
@@ -135,16 +138,77 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Gestión de Usuarios</h1>
           <p className="text-slate-500 dark:text-slate-400">Administra el acceso y facturación de tus clientes</p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors font-bold shadow-lg shadow-blue-600/20"
-          >
-            <UserPlus size={20} />
-            <span className="hidden sm:inline">Nuevo Usuario</span>
-            <span className="sm:hidden">Nuevo</span>
-          </button>
+      </div>
+
+      {/* Embedded Form */}
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-8 transition-colors duration-300">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            {editingId ? <><Edit size={24} /> Editar Usuario</> : <><UserPlus size={24} /> Nuevo Usuario</>}
+          </h2>
+          {editingId && (
+            <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex items-center gap-1">
+              <X size={18} /> Cancelar Edición
+            </button>
+          )}
         </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Usuario</label>
+              <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary outline-none"
+                value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Contraseña {editingId && '(Dejar vacío para mantener)'}</label>
+              <input type="password" required={!editingId} className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
+              <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.firstName} onChange={e => setFormData({ ...formData, firstName: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Apellido</label>
+              <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.lastName} onChange={e => setFormData({ ...formData, lastName: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cédula</label>
+              <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.cedula} onChange={e => setFormData({ ...formData, cedula: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Teléfono</label>
+              <input type="text" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Monto Mensual</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                <input type="number" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 pl-7 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={formData.paymentAmount ?? ''} onChange={e => setFormData({ ...formData, paymentAmount: e.target.value === '' ? '' : Number(e.target.value) })} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de Corte</label>
+              <input type="date" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                value={formData.cutoffDate} onChange={e => setFormData({ ...formData, cutoffDate: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            {editingId && (
+              <button type="button" onClick={resetForm} className="mr-3 px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancelar</button>
+            )}
+            <button type="submit" className="px-6 py-2 bg-primary text-white rounded-lg hover:brightness-90 font-bold shadow-lg shadow-primary/20 transition-colors flex items-center gap-2">
+              <Save size={20} />
+              {editingId ? 'Actualizar Usuario' : 'Guardar Usuario'}
+            </button>
+          </div>
+        </form>
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors duration-300">
@@ -188,7 +252,7 @@ const AdminDashboard = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
-                    <button onClick={() => handleEdit(user)} className="p-1 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" title="Editar">
+                    <button onClick={() => handleEdit(user)} className="p-1 text-slate-400 hover:text-primary dark:hover:text-blue-400 transition-colors" title="Editar">
                       <Edit size={18} />
                     </button>
                     <button onClick={() => handleDelete(user.id)} className="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors" title="Eliminar">
@@ -202,80 +266,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 dark:border-slate-700">
-            <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-800 z-10">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white">{editingId ? 'Editar Usuario' : 'Nuevo Usuario'}</h2>
-              <button onClick={() => { setShowModal(false); resetForm(); }} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
-                <X size={24} />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Usuario</label>
-                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Contraseña {editingId && '(Dejar vacío para mantener)'}</label>
-                  <input type="password" required={!editingId} className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
-                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Apellido</label>
-                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cédula</label>
-                  <input type="text" required className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Teléfono</label>
-                  <input type="text" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                </div>
-              </div>
-              
-              <div className="border-t border-slate-100 dark:border-slate-700 pt-4 mt-4">
-                <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                   Facturación
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Monto Mensual</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                      <input type="number" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 pl-7 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                        value={formData.paymentAmount ?? ''} onChange={e => setFormData({...formData, paymentAmount: e.target.value === '' ? '' : Number(e.target.value)})} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de Corte</label>
-                    <input type="date" className="w-full border dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                      value={formData.cutoffDate} onChange={e => setFormData({...formData, cutoffDate: e.target.value})} />
-                  </div>
-                </div>
-              </div>
 
-              <div className="flex justify-end gap-3 pt-6 border-t border-slate-100 dark:border-slate-700 mt-6 sticky bottom-0 bg-white dark:bg-slate-800">
-                <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancelar</button>
-                <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-lg shadow-blue-600/20 transition-colors">
-                  {editingId ? 'Actualizar Usuario' : 'Guardar Usuario'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
