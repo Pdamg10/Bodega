@@ -224,6 +224,76 @@ api.interceptors.request.use(async (config) => {
         const newProd = { id: Date.now(), ...JSON.parse(config.data || "{}") };
         mockDB.products.push(newProd);
         createdDetails = newProd;
+      } else if (config.url === "/sales/single") {
+        const { productId, quantity } = JSON.parse(config.data || "{}");
+        const prod = mockDB.products.find((p) => p.id === Number(productId));
+        if (!prod)
+          return Promise.reject({
+            response: {
+              status: 404,
+              data: { message: "Producto no encontrado" },
+            },
+          });
+
+        if (prod.stock < quantity)
+          return Promise.reject({
+            response: { status: 400, data: { message: "Stock insuficiente" } },
+          });
+
+        prod.stock -= quantity;
+        const newMovement = {
+          id: Date.now(),
+          type: "OUT",
+          productId: Number(productId),
+          productName: prod.name,
+          quantity: Number(quantity),
+          date: new Date().toISOString(),
+        };
+        mockDB.movements.push(newMovement);
+
+        config.adapter = () =>
+          Promise.resolve({
+            data: { movement: newMovement, product: prod },
+            status: 201,
+            statusText: "Created",
+            headers: {},
+            config,
+            request: {},
+          });
+        return config;
+      } else if (config.url === "/sales/batch") {
+        const { items } = JSON.parse(config.data || "{}");
+        const newMovements = [];
+
+        for (const item of items) {
+          const prod = mockDB.products.find(
+            (p) => p.id === Number(item.productId),
+          );
+          if (prod && prod.stock >= item.quantity) {
+            prod.stock -= item.quantity;
+            const mv = {
+              id: Date.now() + Math.random(),
+              type: "OUT",
+              productId: Number(item.productId),
+              productName: prod.name,
+              quantity: Number(item.quantity),
+              date: new Date().toISOString(),
+            };
+            mockDB.movements.push(mv);
+            newMovements.push(mv);
+          }
+        }
+
+        config.adapter = () =>
+          Promise.resolve({
+            data: { movements: newMovements },
+            status: 201,
+            statusText: "Created",
+            headers: {},
+            config,
+            request: {},
+          });
+        return config;
       }
 
       config.adapter = () =>
