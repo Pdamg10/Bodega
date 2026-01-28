@@ -325,6 +325,13 @@ const getMockData = () =>
   typeof window !== "undefined" ? window.__MOCK_DATA__ : null;
 
 api.interceptors.request.use(async (config) => {
+  const parseBody = (data) => {
+    try {
+      return typeof data === "string" ? JSON.parse(data) : data || {};
+    } catch {
+      return {};
+    }
+  };
   const user = JSON.parse(localStorage.getItem("user"));
   if (user?.access_token) {
     config.headers.Authorization = `Bearer ${user.access_token}`;
@@ -395,7 +402,8 @@ api.interceptors.request.use(async (config) => {
         data = mockDB.supportMessages;
       else if (config.url === "/orders") data = mockDB.orders;
       else if (config.url === "/sales/history") data = mockDB.salesHistory;
-      else if (config.url === "/activity") data = mockDB.logs; // Using logs as activity feed for now
+      else if (config.url === "/activity") data = mockDB.logs;
+      else if (config.url === "/plans") data = mockDB.plans;
 
       if (data) {
         config.adapter = () =>
@@ -418,17 +426,29 @@ api.interceptors.request.use(async (config) => {
       if (config.url === "/users") {
         const newUser = {
           id: Date.now(),
-          ...JSON.parse(config.data || "{}"),
+          ...parseBody(config.data),
           isActive: true,
         };
         mockDB.users.push(newUser);
         createdDetails = newUser;
       } else if (config.url === "/products") {
-        const newProd = { id: Date.now(), ...JSON.parse(config.data || "{}") };
+        const newProd = { id: Date.now(), ...parseBody(config.data) };
         mockDB.products.push(newProd);
         createdDetails = newProd;
+      } else if (config.url === "/customers") {
+        const newCust = {
+          id: Date.now(),
+          ...parseBody(config.data),
+          createdAt: new Date().toISOString(),
+        };
+        mockDB.customers.unshift(newCust); // Add to beginning
+        createdDetails = newCust;
+      } else if (config.url === "/plans") {
+        const newPlan = { id: Date.now(), ...parseBody(config.data) };
+        mockDB.plans.push(newPlan);
+        createdDetails = newPlan;
       } else if (config.url === "/sales/single") {
-        const { productId, quantity } = JSON.parse(config.data || "{}");
+        const { productId, quantity } = parseBody(config.data);
         const prod = mockDB.products.find((p) => p.id === Number(productId));
         if (!prod)
           return Promise.reject({
@@ -521,6 +541,10 @@ api.interceptors.request.use(async (config) => {
         mockDB.users = mockDB.users.filter((u) => u.id !== id);
       } else if (resource === "products") {
         mockDB.products = mockDB.products.filter((u) => u.id !== id);
+      } else if (resource === "customers") {
+        mockDB.customers = mockDB.customers.filter((u) => u.id !== id);
+      } else if (resource === "plans") {
+        mockDB.plans = mockDB.plans.filter((p) => p.id !== id);
       }
 
       config.adapter = () =>
@@ -540,12 +564,20 @@ api.interceptors.request.use(async (config) => {
       const urlParts = config.url.split("/");
       const id = parseInt(urlParts[urlParts.length - 1]);
       const resource = urlParts[1];
-      const updateData = JSON.parse(config.data || "{}");
+      const updateData = parseBody(config.data);
 
       if (resource === "users") {
         const idx = mockDB.users.findIndex((u) => u.id === id);
         if (idx !== -1)
           mockDB.users[idx] = { ...mockDB.users[idx], ...updateData };
+      } else if (resource === "customers") {
+        const idx = mockDB.customers.findIndex((c) => c.id === id);
+        if (idx !== -1)
+          mockDB.customers[idx] = { ...mockDB.customers[idx], ...updateData };
+      } else if (resource === "plans") {
+        const idx = mockDB.plans.findIndex((p) => p.id === id);
+        if (idx !== -1)
+          mockDB.plans[idx] = { ...mockDB.plans[idx], ...updateData };
       }
 
       config.adapter = () =>
@@ -563,7 +595,7 @@ api.interceptors.request.use(async (config) => {
     // Handle PATCH (Partial Update)
     if (config.method === "patch") {
       if (config.url === "/settings/notifications") {
-        const payload = JSON.parse(config.data || "{}");
+        const payload = parseBody(config.data);
         mockDB.notifications = { ...mockDB.notifications, ...payload };
         config.adapter = () =>
           Promise.resolve({
@@ -577,7 +609,7 @@ api.interceptors.request.use(async (config) => {
         return config;
       }
       if (config.url === "/settings/system") {
-        const payload = JSON.parse(config.data || "{}");
+        const payload = parseBody(config.data);
         mockDB.systemConfig = { ...mockDB.systemConfig, ...payload };
         config.adapter = () =>
           Promise.resolve({
@@ -592,39 +624,6 @@ api.interceptors.request.use(async (config) => {
       }
     }
   }
-
-  mock.onGet("/plans").reply(() => {
-    return [200, window.__MOCK_DATA__.plans];
-  });
-
-  mock.onPost("/plans").reply((config) => {
-    const newPlan = JSON.parse(config.data);
-    newPlan.id = Date.now();
-    window.__MOCK_DATA__.plans.push(newPlan);
-    return [200, newPlan];
-  });
-
-  mock.onPut(new RegExp("/plans/\\d+")).reply((config) => {
-    const id = parseInt(config.url.split("/").pop());
-    const data = JSON.parse(config.data);
-    const index = window.__MOCK_DATA__.plans.findIndex((p) => p.id === id);
-    if (index !== -1) {
-      window.__MOCK_DATA__.plans[index] = {
-        ...window.__MOCK_DATA__.plans[index],
-        ...data,
-      };
-      return [200, window.__MOCK_DATA__.plans[index]];
-    }
-    return [404, { message: "Plan not found" }];
-  });
-
-  mock.onDelete(new RegExp("/plans/\\d+")).reply((config) => {
-    const id = parseInt(config.url.split("/").pop());
-    window.__MOCK_DATA__.plans = window.__MOCK_DATA__.plans.filter(
-      (p) => p.id !== id,
-    );
-    return [200, { message: "Plan deleted" }];
-  });
 
   return config;
 });
