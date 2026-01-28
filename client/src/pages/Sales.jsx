@@ -38,7 +38,9 @@ const Sales = () => {
 
   const handleSingleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setMessage('');
+    setLoading(true);
     try {
       const payload = { productId: Number(singleSale.productId), quantity: Number(singleSale.quantity) };
       const res = await api.post('/sales/single', payload);
@@ -49,12 +51,16 @@ const Sales = () => {
     } catch (err) {
       const msg = err?.response?.data?.message || 'Error registrando venta';
       setMessage(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleBatchSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setMessage('');
+    setLoading(true);
     try {
       const validItems = batchItems
         .filter(i => i.productId && i.quantity > 0)
@@ -71,6 +77,8 @@ const Sales = () => {
     } catch (err) {
       const msg = err?.response?.data?.message || 'Error registrando ventas múltiples';
       setMessage(msg);
+    } finally {
+      setLoading(false);
     }
   };
 

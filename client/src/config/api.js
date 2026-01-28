@@ -465,7 +465,7 @@ api.interceptors.request.use(async (config) => {
 
         prod.stock -= quantity;
         const newMovement = {
-          id: Date.now(),
+          id: Date.now() + Math.random(),
           type: "OUT",
           productId: Number(productId),
           productName: prod.name,
@@ -485,7 +485,7 @@ api.interceptors.request.use(async (config) => {
           });
         return config;
       } else if (config.url === "/sales/batch") {
-        const { items } = JSON.parse(config.data || "{}");
+        const { items } = parseBody(config.data);
         const newMovements = [];
 
         for (const item of items) {
