@@ -6,6 +6,9 @@ const AdminSecurity = () => {
     const [pass, setPass] = useState({ current: '', new: '', confirm: '' });
     const [sessions, setSessions] = useState([]);
     const [status, setStatus] = useState({ type: '', message: '' });
+    const [users, setUsers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState('me');
+    const [currentUser, setCurrentUser] = useState(null);
 
     const showStatus = (type, msg) => {
         setStatus({ type, message: msg });
@@ -13,16 +16,42 @@ const AdminSecurity = () => {
     };
 
     useEffect(() => {
+        // Fetch sessions
         api.get('/settings/sessions')
             .then(res => setSessions(res.data || []))
             .catch(() => { });
+
+        // Fetch users for dropdown
+        api.get('/users')
+            .then(res => setUsers(res.data || []))
+            .catch(err => console.error(err));
+
+        // Get current user info from local storage
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            setCurrentUser(JSON.parse(userStr));
+        }
     }, []);
 
-    const changePassword = (e) => {
+    const changePassword = async (e) => {
         e.preventDefault();
         if (pass.new !== pass.confirm) return showStatus('error', 'Las contraseñas no coinciden');
-        showStatus('success', 'Contraseña actualizada');
-        setPass({ current: '', new: '', confirm: '' });
+
+        // If changing OWN password, might want to verify current password (mock/real API support needed)
+        // If changing OTHER user's password (Admin override), usually don't need current password.
+
+        const targetId = selectedUserId === 'me' ? currentUser?.id : Number(selectedUserId);
+
+        if (!targetId) return showStatus('error', 'Usuario no identificado');
+
+        try {
+            await api.put(`/users/${targetId}`, { password: pass.new });
+            showStatus('success', 'Contraseña actualizada correctamente');
+            setPass({ current: '', new: '', confirm: '' });
+        } catch (error) {
+            console.error(error);
+            showStatus('error', 'Error al actualizar contraseña');
+        }
     };
 
     const inputStyle = "w-full border dark:border-slate-600 rounded-xl px-4 py-2.5 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all";
@@ -49,9 +78,28 @@ const AdminSecurity = () => {
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                     <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Cambiar Contraseña</h3>
                     <form onSubmit={changePassword} className="space-y-4 max-w-md">
-                        <input type="password" placeholder="Contraseña actual" className={inputStyle} value={pass.current} onChange={e => setPass({ ...pass, current: e.target.value })} />
-                        <input type="password" placeholder="Nueva contraseña" className={inputStyle} value={pass.new} onChange={e => setPass({ ...pass, new: e.target.value })} />
-                        <input type="password" placeholder="Confirmar nueva contraseña" className={inputStyle} value={pass.confirm} onChange={e => setPass({ ...pass, confirm: e.target.value })} />
+                        <div>
+                            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">Usuario</label>
+                            <select
+                                className={inputStyle}
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                            >
+                                <option value="me">Mi Cuenta ({currentUser?.username})</option>
+                                <optgroup label="Otros Usuarios">
+                                    {users.filter(u => u.id !== currentUser?.id).map(u => (
+                                        <option key={u.id} value={u.id}>{u.username} - {u.firstName} {u.lastName}</option>
+                                    ))}
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        {selectedUserId === 'me' && (
+                            <input type="password" placeholder="Contraseña actual (Opcional en Demo)" className={inputStyle} value={pass.current} onChange={e => setPass({ ...pass, current: e.target.value })} />
+                        )}
+
+                        <input type="password" placeholder="Nueva contraseña" required className={inputStyle} value={pass.new} onChange={e => setPass({ ...pass, new: e.target.value })} />
+                        <input type="password" placeholder="Confirmar nueva contraseña" required className={inputStyle} value={pass.confirm} onChange={e => setPass({ ...pass, confirm: e.target.value })} />
                         <button type="submit" className={buttonStyle}>Actualizar Contraseña</button>
                     </form>
                 </div>

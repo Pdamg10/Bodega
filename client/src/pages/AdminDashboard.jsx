@@ -136,12 +136,12 @@ const AdminDashboard = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Gestión de Usuarios</h1>
-          <p className="text-slate-500 dark:text-slate-400">Administra el acceso y facturación de tus clientes</p>
+          <p className="text-slate-700 dark:text-slate-200 font-medium">Administra el acceso y facturación de tus clientes</p>
         </div>
       </div>
 
       {/* Embedded Form */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-8 transition-colors duration-300">
+      <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 p-6 mb-8 transition-colors duration-300">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
             {editingId ? <><Edit size={24} /> Editar Usuario</> : <><UserPlus size={24} /> Nuevo Usuario</>}
@@ -211,7 +211,7 @@ const AdminDashboard = () => {
         </form>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+      <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 overflow-hidden transition-colors duration-300">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
@@ -229,6 +229,7 @@ const AdminDashboard = () => {
                 <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="font-medium text-slate-900 dark:text-white">{user.username}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Pass: {user.password}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 uppercase">{user.role}</div>
                     <div className="md:hidden text-xs text-slate-500 mt-1">{user.firstName} {user.lastName}</div>
                   </td>

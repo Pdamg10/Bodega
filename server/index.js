@@ -24,6 +24,7 @@ app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/customers", require("./routes/customerRoutes"));
 app.use("/api/movements", require("./routes/movementRoutes"));
 app.use("/api/backups", require("./routes/backupRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
 
 // Misc API routes
 let previewIsSelect = false;

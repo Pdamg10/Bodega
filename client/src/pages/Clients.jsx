@@ -145,7 +145,7 @@ const Clients = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 lg:pt-20">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Clientes</h1>
         <button onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">

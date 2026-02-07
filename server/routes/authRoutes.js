@@ -29,14 +29,4 @@ router.post("/login", (req, res) => {
   }
 });
 
-// Get Users
-router.get("/users", (req, res) => {
-  // In a real app, verify token here
-  const safeUsers = users.map((u) => {
-    const { password, ...rest } = u;
-    return rest;
-  });
-  res.json(safeUsers);
-});
-
 module.exports = router;

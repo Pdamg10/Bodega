@@ -17,7 +17,7 @@ const Layout = () => {
   if (!user) return <Navigate to="/login" />;
 
   const isActive = (path) => location.pathname === path;
-  const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`;
+  const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'}`;
 
   const handleDownloadBackup = async () => {
     try {
@@ -114,12 +114,12 @@ const Layout = () => {
   );
 
   const SidebarFooter = () => (
-    <div className="pt-6 border-t border-slate-800 mt-auto">
+    <div className="pt-6 border-t border-slate-200 dark:border-slate-800 mt-auto">
       <div className="px-4 mb-4">
-        <p className="text-sm font-medium text-white">{user.username}</p>
+        <p className="text-sm font-medium text-slate-800 dark:text-white">{user.username}</p>
         <p className="text-xs text-slate-500 capitalize">{user.role}</p>
       </div>
-      <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-colors">
+      <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-500 transition-colors">
         <LogOut size={20} /> Cerrar Sesión
       </button>
     </div>
@@ -149,13 +149,13 @@ const Layout = () => {
   );
 
   return (
-    <div className="flex bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen">
-      {/* Mobile Header Bar */}
-      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4 justify-between">
+    <div className="flex transition-colors duration-300 min-h-screen bg-transparent">
+      {/* Mobile Top Bar (Visible only on mobile) */}
+      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 z-40 flex items-center px-4 justify-between">
         <span className="ml-12 font-bold text-lg text-slate-800 dark:text-white">Invexis</span>
         <button
           onClick={toggleTheme}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100/50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200"
           aria-label="Cambiar tema"
           title="Cambiar tema"
         >
@@ -163,42 +163,82 @@ const Layout = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Button - Only show when menu is CLOSED */}
+      {/* Desktop Toggle Button (Always visible on desktop, top-left) */}
+      <div className="hidden lg:flex fixed top-4 left-4 z-[100]">
+        <button
+          className="p-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-slate-700 dark:text-white rounded-lg shadow-lg hover:bg-white dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Mobile Menu Button - Mobile Only */}
       {!mobileMenuOpen && (
         <button
-          className="lg:hidden fixed top-3 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg hover:bg-slate-800 transition-colors"
+          className="lg:hidden fixed top-3 left-4 z-50 p-2 bg-slate-900/80 backdrop-blur-sm text-white rounded-lg shadow-lg hover:bg-slate-800 transition-colors"
           onClick={() => setMobileMenuOpen(true)}
         >
           <Menu size={24} />
         </button>
       )}
 
-      {/* Sidebar for Desktop */}
-      <aside className="hidden lg:flex w-64 bg-slate-900 flex-col p-6 min-h-screen flex-shrink-0">
-        <SidebarContent />
-      </aside>
-
-      {/* Sidebar for Mobile */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-slate-900 z-50 p-6 flex flex-col transition-transform duration-300 lg:hidden ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl`}>
-        {/* Mobile Sidebar Header with Close Button */}
-        <div className="flex items-center justify-between mb-6 px-2">
+      {/* Unified Sidebar (Desktop + Mobile) */}
+      {/* 
+        Desktop Logic:
+        - Fixed position, hidden by default (-translate-x-full).
+        - Opens on click (mobileMenuOpen) OR Hover.
+        - MouseEnter on container opens it. MouseLeave closes it (if not forced open via state, but sticking to simple hover + toggle).
+        - To ensure "disappear when not using", we use a group-hover strategy or simple state.
+        
+        Let's use the 'mobileMenuOpen' state for both mobile and desktop toggle, 
+        plus a hover trigger for desktop.
+      */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 z-50 flex flex-col transition-transform duration-300 shadow-2xl 
+          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-[calc(100%-0px)]'} 
+          bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50
+          lg:hover:translate-x-0 group`}
+        onMouseEnter={() => { if (window.innerWidth >= 1024) setMobileMenuOpen(true) }}
+        onMouseLeave={() => { if (window.innerWidth >= 1024) setMobileMenuOpen(false) }}
+      >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between mb-6 px-6 pt-20">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
               <BrandIcon size={32} />
             </div>
-            <h1 className="text-xl font-bold text-white">Invexis</h1>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white">Invexis</h1>
           </div>
-          <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={() => setMobileMenuOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
             <X size={24} />
+          </button>
+
+          {/* Desktop Theme Toggle inside Sidebar */}
+          <button
+            onClick={toggleTheme}
+            className="hidden lg:inline-flex items-center gap-2 px-2 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+            aria-label="Cambiar tema"
+          >
+            {darkMode ? <Moon size={18} /> : <Sun size={18} />}
           </button>
         </div>
 
-        <SidebarNav />
+        <div className="px-4 flex-1 overflow-y-auto">
+          <SidebarNav />
+        </div>
         <SidebarFooter />
       </div>
 
+      {/* Invisible Hover Strip for Desktop to trigger sidebar if closed */}
+      {!mobileMenuOpen && (
+        <div
+          className="hidden lg:block fixed inset-y-0 left-0 w-4 z-40"
+          onMouseEnter={() => setMobileMenuOpen(true)}
+        />
+      )}
 
-      <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
+      <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-transparent transition-colors duration-300">
         <Outlet />
         {warningActive && (
           <div className="fixed bottom-4 right-4 z-50 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-xl shadow">

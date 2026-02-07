@@ -128,7 +128,7 @@ const Sales = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 lg:pt-20">
       <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-8">Punto de Venta</h1>
 
       {message && (
@@ -136,7 +136,7 @@ const Sales = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 p-6">
           <div className="flex items-center gap-2 mb-4">
             <ShoppingCart size={20} className="text-slate-500" />
             <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Venta individual</h2>
@@ -182,7 +182,7 @@ const Sales = () => {
           </form>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 p-6">
           <div className="flex items-center gap-2 mb-4">
             <PlusCircle size={20} className="text-slate-500" />
             <h2 className="text-lg font-semibold text-slate-800 dark:text-white">Ventas múltiples</h2>
@@ -246,7 +246,7 @@ const Sales = () => {
         </div>
       </div>
 
-      <div className="mt-8 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+      <div className="mt-8 bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50">
         <div className="p-6">
           <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Movimientos</h2>
           <div className="overflow-x-auto">

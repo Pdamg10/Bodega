@@ -68,19 +68,19 @@ const UserDashboard = () => {
 
       {/* Header & Actions */}
       {/* Header & Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 -mx-4 md:-mx-8 rounded-b-3xl mb-8 shadow-sm border-b border-white/50 dark:border-slate-700">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-6 -mx-4 md:-mx-8 rounded-b-3xl mb-8 shadow-sm border-b border-white/20 dark:border-slate-700/50">
         <div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Panel de Control</h1>
-          <p className="text-slate-500 dark:text-slate-400">Resumen operativo de tu negocio</p>
+          <p className="text-slate-500 dark:text-slate-300">Resumen operativo de tu negocio</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link to="/user/sales" className="px-4 py-2 bg-primary text-white rounded-lg hover:brightness-90 font-bold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all">
             <DollarSign size={18} /> Nueva Venta
           </Link>
-          <Link to="/user/inventory" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all shadow-sm">
+          <Link to="/user/inventory" className="px-4 py-2 bg-white/80 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 font-medium flex items-center gap-2 transition-all shadow-sm">
             <Package size={18} /> Producto
           </Link>
-          <Link to="/user/clients" className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-all shadow-sm">
+          <Link to="/user/clients" className="px-4 py-2 bg-white/80 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 font-medium flex items-center gap-2 transition-all shadow-sm">
             <UserPlus size={18} /> Cliente
           </Link>
         </div>
@@ -88,42 +88,42 @@ const UserDashboard = () => {
 
       {/* 1. KPIs Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 relative overflow-hidden group hover:shadow-xl transition-all">
+          <div className="absolute right-0 top-0 p-4 opacity-30 group-hover:opacity-50 transition-opacity">
             <DollarSign size={48} className="text-green-500" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Ventas del Día</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Ventas del Día</p>
           <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">${totalSalesToday}</h3>
           <p className="text-xs text-green-500 flex items-center gap-1 mt-2">
             <TrendingUp size={14} /> +12% vs ayer
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 relative overflow-hidden group hover:shadow-xl transition-all">
+          <div className="absolute right-0 top-0 p-4 opacity-30 group-hover:opacity-50 transition-opacity">
             <Package size={48} className="text-blue-500" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Top Producto</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Top Producto</p>
           <h3 className="text-xl font-bold text-slate-800 dark:text-white mt-1 truncate">Arroz 1kg</h3>
           <p className="text-xs text-slate-400 mt-2">45 unidades vendidas</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 relative overflow-hidden group hover:shadow-xl transition-all">
+          <div className="absolute right-0 top-0 p-4 opacity-30 group-hover:opacity-50 transition-opacity">
             <CreditCard size={48} className="text-orange-500" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Por Cobrar</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Por Cobrar</p>
           <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">${pendingPayments}</h3>
           <p className="text-xs text-orange-500 flex items-center gap-1 mt-2">
             {debtClients} clientes con deuda
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg transition-all">
-          <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-md p-5 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 relative overflow-hidden group hover:shadow-xl transition-all">
+          <div className="absolute right-0 top-0 p-4 opacity-30 group-hover:opacity-50 transition-opacity">
             <ClipboardList size={48} className="text-purple-500" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Encargos</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Encargos</p>
           <h3 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">{pendingOrders.length}</h3>
           <p className="text-xs text-purple-500 flex items-center gap-1 mt-2">
             Ver pendientes
@@ -135,7 +135,7 @@ const UserDashboard = () => {
       {(lowStock.length > 0 || overdueClients.length > 0) && (
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {criticalStock.map(p => (
-            <div key={p.id} className="min-w-[250px] bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 p-4 rounded-xl flex items-start gap-3 animate-pulse">
+            <div key={p.id} className="min-w-[250px] bg-red-50/90 dark:bg-red-900/40 backdrop-blur-sm border border-red-100 dark:border-red-800/50 p-4 rounded-xl flex items-start gap-3 animate-pulse">
               <AlertTriangle className="text-red-500 shrink-0" size={20} />
               <div>
                 <h4 className="font-bold text-red-700 dark:text-red-300 text-sm">Sin Stock</h4>
@@ -144,7 +144,7 @@ const UserDashboard = () => {
             </div>
           ))}
           {overdueClients.map(c => (
-            <div key={c.id} className="min-w-[250px] bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 p-4 rounded-xl flex items-start gap-3">
+            <div key={c.id} className="min-w-[250px] bg-orange-50/90 dark:bg-orange-900/40 backdrop-blur-sm border border-orange-100 dark:border-orange-800/50 p-4 rounded-xl flex items-start gap-3">
               <Clock className="text-orange-500 shrink-0" size={20} />
               <div>
                 <h4 className="font-bold text-orange-700 dark:text-orange-300 text-sm">Deuda Vencida</h4>
@@ -153,7 +153,7 @@ const UserDashboard = () => {
             </div>
           ))}
           {lowStock.map(p => (
-            <div key={p.id} className="min-w-[250px] bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-4 rounded-xl flex items-start gap-3">
+            <div key={p.id} className="min-w-[250px] bg-amber-50/90 dark:bg-amber-900/40 backdrop-blur-sm border border-amber-100 dark:border-amber-800/50 p-4 rounded-xl flex items-start gap-3">
               <AlertTriangle className="text-amber-500 shrink-0" size={20} />
               <div>
                 <h4 className="font-bold text-amber-700 dark:text-amber-300 text-sm">Stock Bajo</h4>
@@ -167,7 +167,7 @@ const UserDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* 3. Sales Chart (Last 7 Days) */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+        <div className="lg:col-span-2 bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <TrendingUp size={20} /> Ventas (Últimos 7 días)
@@ -179,7 +179,7 @@ const UserDashboard = () => {
               const heightPct = (day.sales / maxSales) * 100;
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="relative w-full bg-slate-100 dark:bg-slate-700 rounded-t-lg h-full overflow-hidden flex items-end">
+                  <div className="relative w-full bg-slate-100/50 dark:bg-slate-700/50 rounded-t-lg h-full overflow-hidden flex items-end">
                     <div
                       style={{ height: `${heightPct}%` }}
                       className="w-full bg-primary opacity-80 group-hover:opacity-100 transition-all rounded-t-lg relative"
@@ -189,7 +189,7 @@ const UserDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{day.date}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-300 font-medium">{day.date}</span>
                 </div>
               );
             })}
@@ -197,7 +197,7 @@ const UserDashboard = () => {
         </div>
 
         {/* 4. Recent Activity Feed */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg p-6 rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50">
           <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
             <Activity size={20} /> Actividad Reciente
           </h3>
@@ -227,7 +227,7 @@ const UserDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* 5. Cuentas por Cobrar */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <CreditCard size={20} className="text-primary" /> Cuentas por Cobrar
@@ -236,7 +236,7 @@ const UserDashboard = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400">
+              <thead className="bg-slate-50/50 dark:bg-slate-900/30 text-slate-500 dark:text-slate-400">
                 <tr>
                   <th className="px-6 py-3 font-medium">Cliente</th>
                   <th className="px-6 py-3 font-medium">Monto</th>
@@ -245,7 +245,7 @@ const UserDashboard = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {data.customers.filter(c => c.debt?.currentDebt > 0).slice(0, 5).map(c => (
-                  <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                  <tr key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
                     <td className="px-6 py-3 font-medium text-slate-800 dark:text-white">{c.firstName} {c.lastName}</td>
                     <td className="px-6 py-3 font-bold text-slate-800 dark:text-white">${c.debt.currentDebt}</td>
                     <td className="px-6 py-3">
@@ -264,7 +264,7 @@ const UserDashboard = () => {
         </div>
 
         {/* 6. Encargos Pendientes */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 overflow-hidden">
           <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
             <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <ClipboardList size={20} className="text-purple-500" /> Encargos

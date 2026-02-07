@@ -3,9 +3,19 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    min-height: 100vh;
+  }
   body {
-    @apply bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-white transition-colors duration-300;
+    @apply text-slate-900 dark:text-white transition-colors duration-300;
     --primary-color: #2563eb;
+    background: linear-gradient(191deg, #97acd8,#d279b7,#e0533a);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background: linear-gradient(36deg, #8d0ab3, #1e227c, #6f4ae6);
+    background-attachment: fixed; /* Ensures gradient covers full height on scroll */
   }
 
   /* Apply smooth transition to all color-related properties for common elements */

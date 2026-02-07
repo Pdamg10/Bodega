@@ -43,6 +43,18 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [darkMode]);
 
+  // Listen for storage changes in other tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'theme') {
+        setDarkMode(e.newValue === 'dark');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Apply Theme Color to CSS Variable
   useEffect(() => {
     document.documentElement.style.setProperty('--primary-color', themeColor);

@@ -156,14 +156,14 @@ const Inventory = () => {
         const text = reader.result.toString();
         const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
         const header = lines.shift();
-        const cols = header.split(',').map(c => c.replace(/^"+|"+$/g,''));
-        const idx = Object.fromEntries(cols.map((c,i)=>[c,i]));
+        const cols = header.split(',').map(c => c.replace(/^"+|"+$/g, ''));
+        const idx = Object.fromEntries(cols.map((c, i) => [c, i]));
         const items = lines.map(l => {
           // naive CSV parsing; supports quoted values without embedded commas
           const parts = l.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
           const val = (k) => {
             const raw = parts[idx[k]] ?? '';
-            return raw.replace(/^"+|"+$/g,'');
+            return raw.replace(/^"+|"+$/g, '');
           };
           return {
             name: val('name'),
@@ -187,7 +187,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 lg:pt-20">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Inventario</h1>
         <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ const Inventory = () => {
 
       {message && <div className="mb-4 text-sm text-slate-700 dark:text-slate-200">{message}</div>}
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+      <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 dark:border-slate-700/50 p-6">
         <div className="flex items-center gap-2 mb-4">
           <Search size={18} className="text-slate-500" />
           <input
@@ -218,7 +218,7 @@ const Inventory = () => {
           <select
             className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 text-slate-800 dark:text-white"
             value={categoryFilter}
-            onChange={(e)=>setCategoryFilter(e.target.value)}
+            onChange={(e) => setCategoryFilter(e.target.value)}
           >
             <option value="">Todas las categorías</option>
             {Array.from(new Set(products.map(p => p.category).filter(Boolean))).map(c => (
@@ -282,7 +282,7 @@ const Inventory = () => {
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-6">
+          <div className="w-full max-w-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 dark:border-slate-700/50 p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-slate-800 dark:text-white">{form.id ? 'Editar producto' : 'Nuevo producto'}</h2>
               <button onClick={closeForm} className="text-slate-600 dark:text-slate-300">
