@@ -96,7 +96,9 @@ const Clients = () => {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double submit
     setMessage('');
+    setLoading(true); // Start loading
     const payload = {
       firstName: form.firstName,
       lastName: form.lastName,
@@ -130,6 +132,8 @@ const Clients = () => {
     } catch (err) {
       const msg = err?.response?.data?.message || 'Error guardando cliente';
       setMessage(msg);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -185,9 +189,9 @@ const Clients = () => {
                   <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{c.cedula || '-'}</td>
                   <td className="px-3 py-2 text-slate-700 dark:text-slate-200">{c.phone || '-'}</td>
                   <td className="px-3 py-2">
-                    {c.debt?.enabled ? (
+                    {c.debt?.enabled && c.debt.parts > 0 ? (
                       <span className="text-slate-700 dark:text-slate-200">
-                        {c.debt.parts} partes de ${Number(c.debt.installmentAmount || 0).toFixed(2)} — {c.debt.frequency}
+                        {c.debt.parts} cuotas de ${Number(c.debt.installmentAmount || 0).toFixed(2)} — {c.debt.frequency}
                       </span>
                     ) : (
                       <span className="text-slate-500">Sin deuda</span>
@@ -393,8 +397,8 @@ const Clients = () => {
                 <button type="button" onClick={closeForm} className="px-4 py-2 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white">
                   Cancelar
                 </button>
-                <button type="submit" className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
-                  <Save size={16} /> Guardar
+                <button type="submit" disabled={loading} className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-white ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}>
+                  <Save size={16} /> {loading ? 'Guardando...' : 'Guardar'}
                 </button>
               </div>
             </form>

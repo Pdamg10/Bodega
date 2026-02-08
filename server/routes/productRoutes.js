@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-let { products, movements } = require("../data/store");
+let { products, movements, save } = require("../data/store");
 const { createClient } = require("@supabase/supabase-js");
 
 const SUPABASE_URL = process.env.SUPABASE_URL || null;
@@ -21,12 +21,10 @@ router.get("/", async (req, res) => {
       .select("*")
       .order("id", { ascending: false });
     if (error) {
-      return res
-        .status(500)
-        .json({
-          message: "Error en Supabase (products)",
-          detail: error.message,
-        });
+      return res.status(500).json({
+        message: "Error en Supabase (products)",
+        detail: error.message,
+      });
     }
     res.json(data || []);
   } catch (err) {
@@ -64,6 +62,7 @@ router.post("/", async (req, res) => {
       photoData: photoData || null,
     };
     products.push(newProduct);
+    save();
     return res.status(201).json(newProduct);
   }
   try {
@@ -89,12 +88,10 @@ router.post("/", async (req, res) => {
     }
     res.status(201).json(data);
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        message: "Error en servidor al crear producto",
-        detail: err.message,
-      });
+    res.status(500).json({
+      message: "Error en servidor al crear producto",
+      detail: err.message,
+    });
   }
 });
 
@@ -108,6 +105,7 @@ router.put("/:id", async (req, res) => {
     }
     const updates = req.body;
     products[idx] = { ...products[idx], ...updates, id };
+    save();
     return res.json(products[idx]);
   }
   try {
@@ -119,24 +117,20 @@ router.put("/:id", async (req, res) => {
       .select()
       .single();
     if (error) {
-      return res
-        .status(500)
-        .json({
-          message: "Error actualizando producto",
-          detail: error.message,
-        });
+      return res.status(500).json({
+        message: "Error actualizando producto",
+        detail: error.message,
+      });
     }
     if (!data) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
     res.json(data);
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        message: "Error en servidor al actualizar producto",
-        detail: err.message,
-      });
+    res.status(500).json({
+      message: "Error en servidor al actualizar producto",
+      detail: err.message,
+    });
   }
 });
 
@@ -144,18 +138,13 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   if (!hasSupabase) {
-    const exists = products.some((p) => p.id === id);
-    if (!exists) {
+    const idx = products.findIndex((p) => p.id === id);
+    if (idx !== -1) {
+      products.splice(idx, 1);
+      save();
+    } else {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
-    products = products.filter((p) => p.id !== id);
-    // Note: This does not remove related movements in the in-memory version for simplicity, consider improving if needed.
-    // In store.js, we are exporting 'let products', but reassignment here won't affect the module export directly
-    // unless we change how store.js works or use array mutation.
-    // Better to use splice:
-    const idx = products.findIndex((p) => p.id === id);
-    if (idx !== -1) products.splice(idx, 1);
-
     return res.json({ message: "Producto eliminado" });
   }
   try {
@@ -167,12 +156,10 @@ router.delete("/:id", async (req, res) => {
     }
     res.json({ message: "Producto eliminado" });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        message: "Error en servidor al eliminar producto",
-        detail: err.message,
-      });
+    res.status(500).json({
+      message: "Error en servidor al eliminar producto",
+      detail: err.message,
+    });
   }
 });
 

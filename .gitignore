@@ -12,6 +12,7 @@ server/.env
 .env
 
 # Database
+server/data/db.json
 server/bodega.sqlite
 server/bodega.sqlite-shm
 server/bodega.sqlite-wal

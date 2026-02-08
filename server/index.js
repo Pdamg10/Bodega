@@ -25,45 +25,12 @@ app.use("/api/customers", require("./routes/customerRoutes"));
 app.use("/api/movements", require("./routes/movementRoutes"));
 app.use("/api/backups", require("./routes/backupRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/sales", require("./routes/salesRoutes"));
 
 // Misc API routes
-let previewIsSelect = false;
+app.use("/api", require("./routes/miscRoutes"));
 
-app.get("/api", (req, res) => {
-  res.send("Bodega API is running");
-});
-
-app.get("/api/getThemeColors", (req, res) => {
-  res.json({
-    primary: "#2563eb",
-    secondary: "#10b981",
-    backgroundLight: "#ffffff",
-    backgroundDark: "#0f172a",
-    textLight: "#0f172a",
-    textDark: "#ffffff",
-    borderLight: "#e2e8f0",
-    borderDark: "#334155",
-  });
-});
-
-app.get("/api/getLanguageText", (req, res) => {
-  const lang = (req.query.lang || "es").toLowerCase();
-  const dict = {
-    es: { ok: "OK", cancel: "Cancelar", theme: "Tema", language: "Idioma" },
-    en: { ok: "OK", cancel: "Cancel", theme: "Theme", language: "Language" },
-  };
-  res.json(dict[lang] || dict.es);
-});
-
-app.get("/api/getWorkspacePath", (req, res) => {
-  res.json({ path: process.cwd() });
-});
-
-app.post("/api/setIsSelect", (req, res) => {
-  const { isSelect } = req.body || {};
-  previewIsSelect = !!isSelect;
-  res.json({ isSelect: previewIsSelect });
-});
+// setIsSelect is handled in miscRoutes
 
 // Sales Batch specific route (needs access to movements and products)
 // This is a bit complex as it was inline.
@@ -85,4 +52,5 @@ app.use("/api/sales", require("./routes/salesRoutes"));
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log("SERVER STARTED WITH FILE DATABASE SYSTEM active");
 });

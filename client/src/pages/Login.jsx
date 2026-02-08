@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Lock, User, Eye, EyeOff, Moon, Sun, ArrowRight } from 'lucide-react';
 import BrandIcon from '../components/BrandIcon';
+import api from '../config/api';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -42,16 +43,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      // In a real app, use axios to call the backend
-      // But we need to use the 'api' instance which has the base URL
-      // Import it dynamically or assume it's available. 
-      // Better to import 'api' at the top. 
-      // Since I can't easily add imports without rewriting the file, I'll use fetch with API_URL from env or default
-
-      // WAIT: I should import 'api' from '../config/api'. 
-      // I will replace the imports in a separate block or assume I can rewrite the whole file if needed.
-      // Let's use the 'api' import I will add.
-      const res = await import('../config/api').then(m => m.default.post('/users/verify-email', { email: resetEmail }));
+      const res = await api.post('/users/verify-email', { email: resetEmail });
       if (res.data.success) {
         setResetUserId(res.data.userId);
         setResetStep(2);
@@ -69,7 +61,7 @@ const Login = () => {
       return;
     }
     try {
-      await import('../config/api').then(m => m.default.put(`/users/${resetUserId}`, { password: newPassword }));
+      await api.put(`/users/${resetUserId}`, { password: newPassword });
       setResetSuccess(true);
       setTimeout(() => {
         setIsResetting(false);

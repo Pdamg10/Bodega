@@ -1,0 +1,113 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "firstName": "System",
+      "lastName": "Admin",
+      "email": "admin@bodega.com",
+      "cedula": "0000000000",
+      "phone": "555-5555",
+      "paymentMethod": "Efectivo",
+      "paymentAmount": 0,
+      "startDate": "2024-01-01T00:00:00.000Z",
+      "cutoffDate": "",
+      "isActive": true
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Arroz 1kg",
+      "category": "Granos",
+      "stock": 45,
+      "minStock": 20,
+      "price": 1.2,
+      "cost": 0.8,
+      "expirationDate": "2025-12-31"
+    },
+    {
+      "id": 2,
+      "name": "Aceite 1L",
+      "category": "Aceites",
+      "stock": 8,
+      "minStock": 10,
+      "price": 2.5,
+      "cost": 1.6,
+      "expirationDate": "2026-06-30"
+    },
+    {
+      "id": 3,
+      "name": "Leche 1L",
+      "category": "Lácteos",
+      "stock": 5,
+      "minStock": 15,
+      "price": 0.9,
+      "cost": 0.6,
+      "expirationDate": "2024-02-15"
+    },
+    {
+      "id": 4,
+      "name": "Atún en lata",
+      "category": "Conservas",
+      "stock": 100,
+      "minStock": 20,
+      "price": 1.5,
+      "cost": 1.0,
+      "expirationDate": "2027-01-01"
+    },
+    {
+      "id": 5,
+      "name": "Yogurt Fresa",
+      "category": "Lácteos",
+      "stock": 12,
+      "minStock": 10,
+      "price": 0.8,
+      "cost": 0.55,
+      "expirationDate": "2024-02-01"
+    }
+  ],
+  "movements": [
+    {
+      "id": 1,
+      "type": "IN",
+      "productId": 1,
+      "productName": "Arroz 1kg",
+      "quantity": 50,
+      "date": "2024-01-01T00:00:00.000Z",
+      "userId": 1
+    },
+    {
+      "id": 2,
+      "type": "OUT",
+      "productId": 2,
+      "productName": "Aceite 1L",
+      "quantity": 2,
+      "date": "2024-01-02T00:00:00.000Z",
+      "userId": 2
+    }
+  ],
+  "customers": [
+    {
+      "id": 1,
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "cedula": "12345678",
+      "phone": "555-1111",
+      "debt": { "enabled": false, "parts": 0, "installmentAmount": 0, "frequency": null },
+      "specialOrder": {
+        "enabled": false,
+        "product": "",
+        "payInAdvance": false,
+        "advanceAmount": 0,
+        "notes": ""
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "backups": [],
+  "backupLogs": [],
+  "backupSchedule": { "enabled": false, "frequency": null, "nextRun": null }
+}

@@ -8,13 +8,14 @@ import { useTheme } from '../context/ThemeContext';
 import BrandIcon from '../components/BrandIcon';
 
 const Layout = () => {
-  const { user, logout, warningActive, secondsLeft } = useAuth();
+  const { user, logout, warningActive, secondsLeft, loading } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backupMenuOpen, setBackupMenuOpen] = useState(false);
 
-  if (!user) return <Navigate to="/login" />;
+  if (loading || (typeof loading === 'undefined' && !user)) return <div className="flex items-center justify-center min-h-screen bg-slate-900"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>;
+  if (!user && !loading) return <Navigate to="/login" />;
 
   const isActive = (path) => location.pathname === path;
   const linkClass = (path) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(path) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'}`;
@@ -196,11 +197,8 @@ const Layout = () => {
       */}
       <div
         className={`fixed inset-y-0 left-0 w-64 z-50 flex flex-col transition-transform duration-300 shadow-2xl 
-          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-[calc(100%-0px)]'} 
-          bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50
-          lg:hover:translate-x-0 group`}
-        onMouseEnter={() => { if (window.innerWidth >= 1024) setMobileMenuOpen(true) }}
-        onMouseLeave={() => { if (window.innerWidth >= 1024) setMobileMenuOpen(false) }}
+          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+          bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/50 dark:border-slate-700/50`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between mb-6 px-6 pt-20">
@@ -231,12 +229,7 @@ const Layout = () => {
       </div>
 
       {/* Invisible Hover Strip for Desktop to trigger sidebar if closed */}
-      {!mobileMenuOpen && (
-        <div
-          className="hidden lg:block fixed inset-y-0 left-0 w-4 z-40"
-          onMouseEnter={() => setMobileMenuOpen(true)}
-        />
-      )}
+
 
       <main className="flex-1 w-full pt-20 lg:pt-0 min-h-screen bg-transparent transition-colors duration-300">
         <Outlet />
