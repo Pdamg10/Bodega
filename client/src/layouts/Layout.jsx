@@ -195,6 +195,15 @@ const Layout = () => {
         Let's use the 'mobileMenuOpen' state for both mobile and desktop toggle, 
         plus a hover trigger for desktop.
       */}
+      {/* Backdrop Overlay for closing sidebar */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Unified Sidebar (Desktop + Mobile) */}
       <div
         className={`fixed inset-y-0 left-0 w-64 z-50 flex flex-col transition-transform duration-300 shadow-2xl 
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
